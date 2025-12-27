@@ -1,0 +1,230 @@
+<!-- pages/memory/index.wxml -->
+<view class="page">
+
+  <!-- 左侧导航（仅 Pad 显示） -->
+  <view class="sidebar" wx:if="{{isPad}}">
+    <view class="logo-wrap">
+      <text class="logo-main">笔杆子DIY</text>
+    </view>
+
+    <view class="nav-list">
+      <view 
+        wx:for="{{navItems}}" 
+        wx:key="name"
+        class="nav-item {{activeNav === item.name ? 'nav-active' : ''}}"
+        data-name="{{item.name}}"
+        data-route="{{item.route}}"
+        bindtap="onNavItemTap"
+      >
+        <text class="nav-icon">{{item.icon}}</text>
+        <text class="nav-text">{{item.name}}</text>
+      </view>
+    </view>
+
+    <view class="user-box" bindtap="goToMe">
+      <view class="avatar"></view>
+      <text class="user-name">用户名称</text>
+    </view>
+  </view>
+
+  <!-- 主区域 -->
+  <view class="main">
+    <view class="main-content">
+      <!-- 顶部模式条 -->
+      <view class="topbar">
+      <view class="mode-group">
+        <view class="mode-btn {{viewMode === 'study' ? 'mode-active' : ''}}" data-mode="study" bindtap="switchViewMode">
+          <text class="mode-icon">📚</text>
+          <text class="mode-text">背诵模式</text>
+        </view>
+        <view class="mode-btn {{viewMode === 'quiz' ? 'mode-active-quiz' : ''}}" data-mode="quiz" bindtap="switchViewMode">
+          <text class="mode-icon">🧪</text>
+          <text class="mode-text">测验模式</text>
+        </view>
+      </view>
+
+      <view class="topbar-right">
+        <view class="status-box">
+          <text class="status-label">STATUS</text>
+          <text class="status-value">
+            {{viewMode === 'study' ? '今日待复习' : '本轮待测验'}}：{{pendingCount}}
+          </text>
+        </view>
+        <view class="settings-btn" bindtap="toggleSettings">⚙️</view>
+      </view>
+    </view>
+
+    <!-- 卡片区域 -->
+    <view class="card-wrapper">
+      <block wx:if="{{currentMaterial}}">
+        <view class="flip-container {{isFlipped ? 'flipped' : ''}}" bindtap="toggleFlip">
+          <view class="flipper">
+
+            <!-- 正面 -->
+            <view class="card-face card-front {{viewMode === 'quiz' ? 'front-quiz' : ''}}">
+              <view class="card-header">
+                <view class="tag-group">
+                  <view class="tag-chip">{{currentMaterial.type}}</view>
+                  <text class="field-chip">{{currentMaterial.field}}</text>
+                </view>
+
+                <!-- 新增：peek 小眼睛 -->
+                    <view wx:if="{{viewMode === 'study'}}"
+                      class="peek-btn {{isPeek ? 'peek-active' : ''}}"
+                      catchtap="togglePeek">
+                  <text wx:if="{{!isPeek}}">👁️‍🗨️</text>
+                  <text wx:else>👁️</text>
+                </view>
+              </view>
+
+              <view class="card-body">
+                <block wx:if="{{viewMode === 'quiz'}}">
+                  <view class="quiz-center">
+                    <view class="quiz-icon">?</view>
+                    <text class="quiz-text">请尝试默写或口述完整句子</text>
+                    <view class="hint-pill">
+                      <text class="hint-label">提示关键词：</text>
+                      <view class="hint-keys">
+                        <text class="hint-key" wx:for="{{currentMaterial.keywords}}" wx:key="*this">
+                          {{item}}
+                        </text>
+                      </view>
+                    </view>
+                  </view>
+                </block>
+
+                <block wx:else>
+                  <view class="quote-line">
+                    <text class="quote-mark">“</text>
+                    <block wx:for="{{displayParts}}" wx:key="index">
+                      <text wx:if="{{!item.isKeyword}}" class="normal-text">{{item.text}}</text>
+                      <view wx:else class="keyword-wrapper" catchtouchstart="startPeek" catchtouchend="endPeek">
+                        <text class="keyword-text {{isFlipped || isPeek ? 'kw-visible' : 'kw-hidden'}}">{{item.text}}</text>
+                        <view wx:if="{{!(isFlipped || isPeek)}}" class="keyword-mask"></view>
+                      </view>
+                    </block>
+                    <text class="quote-mark">”</text>
+                  </view>
+                </block>
+              </view>
+
+              <view class="card-footer">
+                <text class="tip-text">
+                  {{viewMode === 'study' ? '轻点卡片查看完整内容，长按小眼睛可偷看关键词' : '轻点卡片查看正确答案'}}
+                </text>
+              </view>
+            </view>
+
+            <!-- 背面 -->
+            <view class="card-face card-back">
+              <scroll-view scroll-y="true" class="back-scroll">
+                <view class="back-section">
+                  <text class="section-label">完整原句</text>
+                  <text class="section-full">“{{currentMaterial.content}}”</text>
+                </view>
+
+                <block wx:if="{{viewMode === 'study'}}">
+                  <view class="back-section">
+                    <text class="section-label">核心释义</text>
+                    <text class="section-content">{{currentMaterial.meaning}}</text>
+                  </view>
+
+                  <view class="back-section">
+                    <text class="section-label">句法拆解</text>
+                    <view class="structure-box">
+                      <text class="structure-text">{{currentMaterial.structure}}</text>
+                    </view>
+                  </view>
+
+                  <view class="back-section">
+                    <text class="section-usage">💡 {{currentMaterial.usageTip}}</text>
+                  </view>
+                </block>
+
+                <block wx:else>
+                  <view class="back-section">
+                    <text class="section-label">自测提醒</text>
+                    <text class="section-content">
+                      注意关键词：
+                      <text class="section-highlight" wx:for="{{currentMaterial.keywords}}" wx:key="*this">
+                        {{item}}
+                      </text>
+                    </text>
+                  </view>
+                </block>
+              </scroll-view>
+
+              <view class="back-footer">
+                <view class="level-dots">
+                  <view wx:for="{{[1,2,3]}}" wx:key="*this"
+                        class="dot {{item <= currentMaterial.memoryLevel ? 'dot-active' : ''}}"></view>
+                </view>
+                <text class="source-text">来源：{{currentMaterial.source}}</text>
+              </view>
+            </view>
+
+          </view>
+        </view>
+
+        <!-- 底部按钮 -->
+        <view class="bottom-bar">
+          <button class="btn-fail" data-action="fail" bindtap="handleMemoryAction">还没记住</button>
+          <text class="progress-text">{{currentIndex + 1}} / {{reviewList.length}}</text>
+          <button class="btn-pass" data-action="pass" bindtap="handleMemoryAction">掌握了</button>
+        </view>
+      </block>
+
+      <!-- 空状态 -->
+      <block wx:else>
+        <view class="empty">
+          <text class="empty-icon">🎉</text>
+          <text class="empty-title">本阶段任务已完成</text>
+          <text class="empty-sub">当前没有需要复习的素材</text>
+          <button class="restart-btn" bindtap="restartReview">重新开始一轮</button>
+        </view>
+      </block>
+    </view>
+    </view>
+  </view>
+
+  <!-- 设置弹层 -->
+  <view class="overlay" wx:if="{{showSettings}}" bindtap="toggleSettings">
+    <view class="panel" catchtap="true">
+      <view class="panel-header">
+        <text class="panel-title">背诵与测验设置</text>
+        <text class="panel-close" bindtap="toggleSettings">×</text>
+      </view>
+
+      <scroll-view scroll-y="true" class="panel-body">
+        <view class="panel-card">
+          <view class="panel-card-title">本周已复习 · {{weekReviewCount}} 条</view>
+          <view class="panel-progress">
+            <view class="panel-progress-inner" style="width: {{weekReviewCount > 0 ? Math.min(weekReviewCount / 15 * 100, 100) : 0}}%;"></view>
+          </view>
+          <text class="panel-card-sub" bindtap="goToMe">详细总览请前往【我的·学习报告】</text>
+        </view>
+
+        <view class="setting-block">
+          <text class="setting-label">背诵范围</text>
+          <view class="setting-tags">
+            <view wx:for="{{categories}}" wx:key="*this"
+                  class="setting-tag {{currentCategory === item ? 'setting-tag-active' : ''}}"
+                  data-cat="{{item}}" bindtap="switchCategory">
+              {{item}}
+            </view>
+          </view>
+        </view>
+
+        <view class="setting-block">
+          <text class="setting-label">随机顺序</text>
+          <switch checked="{{shuffleEnabled}}" bindchange="toggleShuffle" color="#5A7D9A"/>
+        </view>
+      </scroll-view>
+
+      <view class="panel-footer">
+        <button class="panel-btn" bindtap="toggleSettings">保存并返回</button>
+      </view>
+    </view>
+  </view>
+
+</view>

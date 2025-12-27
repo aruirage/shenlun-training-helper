@@ -1,0 +1,22 @@
+{
+  "pages": [
+    "pages/home/index",
+    "pages/hot/index",
+    "pages/hot-list/index",
+    "pages/materials/index",
+    "pages/hot-train/index",
+    "pages/full-train/index",
+    "pages/memory/index",
+    "pages/me/index",
+    "pages/comment/index"
+  ],
+  "window": {
+    "pageOrientation": "landscape",
+    "navigationBarTitleText": "申论训练助手",
+    "navigationBarBackgroundColor": "#FDF7F2",
+    "navigationBarTextStyle": "black",
+    "backgroundColor": "#FDF7F2"
+  },
+  "sitemapLocation": "sitemap.json",
+  "style": "v2"
+}

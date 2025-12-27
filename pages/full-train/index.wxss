@@ -1,0 +1,659 @@
+/* pages/full-train/index.wxss - 重构版：手写支架式作文训练 */
+
+/* ============ 全局容器 ============ */
+.full-train-container {
+  display: flex;
+  height: 100vh;
+  background-color: #F9F9F8;
+  color: #1A1A1A;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  position: relative;
+  overflow: hidden;
+}
+
+/* ============ 左侧导航栏 ============ */
+.full-train-nav {
+  width: 240px;
+  border-right: 1px solid #EFEEEE;
+  display: flex;
+  flex-direction: column;
+  background-color: white;
+  flex-shrink: 0;
+}
+
+.nav-header {
+  padding: 32px 16px 16px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 40px;
+}
+
+.nav-logo {
+  width: 32px;
+  height: 32px;
+  border-radius: 8px;
+  background-color: #5A7D9A;
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: bold;
+  font-size: 18px;
+}
+
+.nav-title {
+  font-size: 13px;
+  font-weight: 600;
+  color: #666;
+}
+
+.nav-menu {
+  flex: 1;
+  padding: 0 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.nav-item {
+  padding: 12px 16px;
+  border-radius: 12px;
+  font-size: 14px;
+  font-weight: 500;
+  color: #999;
+  transition: all 0.2s;
+}
+
+.nav-item.active {
+  background-color: rgba(90, 125, 154, 0.06);
+  color: #5A7D9A;
+  font-weight: 600;
+}
+
+/* ============ 中间主内容区 ============ */
+.full-train-main {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  overflow-y: auto;
+  border-right: 1px solid #EFEEEE;
+  min-width: 0;
+}
+
+.content-wrapper {
+  padding: 32px;
+  width: 100%;
+  height: 100%;
+  overflow-y: auto;
+}
+
+/* ============ 题目卡片 ============ */
+.essay-card {
+  background-color: white;
+  border-radius: 24px;
+  border: 1px solid #F0F0F0;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.01);
+  overflow: hidden;
+}
+
+.card-header {
+  border-bottom: 1px solid #F9F9F9;
+}
+
+.chips-row {
+  display: flex;
+  gap: 8px;
+}
+
+.chip {
+  display: inline-block;
+  padding: 4px 8px;
+  border-radius: 6px;
+  font-size: 10px;
+  font-weight: 700;
+}
+
+.chip-primary {
+  background-color: rgba(90, 125, 154, 0.09);
+  color: #5A7D9A;
+}
+
+.chip-warning {
+  background-color: rgba(245, 158, 11, 0.08);
+  color: rgba(180, 83, 9, 0.9);
+  border: 1px solid rgba(245, 158, 11, 0.2);
+}
+
+.card-body {
+  padding: 24px;
+}
+
+.essay-title {
+  font-size: 18px;
+  font-weight: 700;
+  line-height: 1.5;
+}
+
+.card-footer {
+  padding: 16px 24px 24px;
+  background-color: #FBFBFA;
+}
+
+.main-thesis-input {
+  width: 100%;
+  padding: 12px 16px;
+  background-color: white;
+  border: 1px solid #EEE;
+  border-radius: 12px;
+  font-size: 14px;
+  box-sizing: border-box;
+  min-height: 44px;
+  line-height: 1.5;
+}
+
+.main-thesis-input:focus {
+  border-color: #5A7D9A;
+  box-shadow: 0 0 0 1px #5A7D9A;
+}
+
+/* ============ 右侧材料区 ============ */
+.full-train-right {
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  width: 420px;
+  background-color: white;
+  border-left: 1px solid #EFEEEE;
+  display: flex;
+  flex-direction: column;
+  overflow: visible;
+  transition: width 0.2s ease-out;
+  z-index: 30;
+}
+
+/* 调整手柄 */
+.resize-handle {
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: 8px;
+  cursor: ew-resize;
+  z-index: 100;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.resize-handle:hover {
+  background-color: rgba(90, 125, 154, 0.05);
+}
+
+.resize-line {
+  width: 2px;
+  height: 40px;
+  background-color: #E5E5E5;
+  border-radius: 2px;
+}
+
+.resize-handle:hover .resize-line {
+  background-color: #5A7D9A;
+}
+
+.full-train-right.collapsed .material-panel,
+.full-train-right.collapsed .resize-handle {
+  opacity: 0;
+  pointer-events: none;
+}
+
+.full-train-right.collapsed {
+  width: 0;
+  border-color: transparent;
+}
+
+/* 隐藏按钮 */
+.panel-toggle-btn {
+  position: absolute;
+  left: -22px;
+  top: 12px;
+  width: 24px;
+  height: 24px;
+  background-color: white;
+  border: 1px solid #E5E5E5;
+  border-radius: 6px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  z-index: 101;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+  transition: all 0.2s;
+}
+
+.panel-toggle-btn:hover {
+  background-color: #5A7D9A;
+  border-color: #5A7D9A;
+}
+
+.panel-toggle-btn:hover .toggle-icon {
+  color: white;
+}
+
+.toggle-icon {
+  font-size: 16px;
+  font-weight: 700;
+  color: #999;
+}
+
+/* 显示按钮（右侧栏隐藏时） */
+
+/* ====== 材料面板 ====== */
+.material-panel {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.material-header {
+  padding: 16px 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-bottom: 1px solid #F9F9F9;
+  flex-shrink: 0;
+  position: relative;
+  min-height: 64px;
+}
+
+.material-title {
+  font-size: 14px;
+  font-weight: 700;
+  color: #333;
+  text-align: center;
+  padding-right: 80px;
+}
+
+.material-tools {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  display: flex;
+  gap: 6px;
+}
+
+.tool-btn-icon {
+  width: 32px;
+  height: 32px;
+  padding: 0;
+  background-color: #F9F9F8;
+  border: 1px solid #EFEEEE;
+  border-radius: 50%;
+  font-size: 14px;
+  font-weight: 600;
+  color: #666;
+  transition: all 0.2s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.tool-btn-icon.active {
+  background-color: #5A7D9A;
+  color: white;
+  border-color: #5A7D9A;
+}
+
+.tool-btn-icon:active {
+  transform: scale(0.95);
+}
+
+.material-content {
+  flex: 1;
+  overflow-y: auto;
+  position: relative;
+  padding: 20px;
+}
+
+.material-text {
+  font-size: 13px;
+  line-height: 1.8;
+  color: #4D4D4D;
+  white-space: pre-wrap;
+}
+
+.material-overlay-canvas {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(90, 125, 154, 0.03);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 2px dashed #5A7D9A;
+  z-index: 10;
+}
+
+.canvas-placeholder {
+  font-size: 12px;
+  color: #5A7D9A;
+  font-weight: 600;
+}
+
+/* ====== 分论点写作区 ====== */
+.sections-panel {
+  margin-top: 24px;
+  display: flex;
+  flex-direction: column;
+}
+
+.sections-header {
+  padding: 16px 0;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border-bottom: 1px solid #F0F0F0;
+  margin-bottom: 16px;
+}
+
+.sections-title {
+  font-size: 14px;
+  font-weight: 700;
+  color: #333;
+}
+
+.sections-count {
+  font-size: 12px;
+  font-weight: 600;
+  color: #5A7D9A;
+}
+
+.sections-list {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+/* ====== 分论点卡片 ====== */
+.section-card {
+  padding: 20px;
+  background-color: #FBFBFA;
+  border-radius: 16px;
+  border: 1px solid #F0F0F0;
+}
+
+.section-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 16px;
+}
+
+.section-peek-btn {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  border: 1px solid #D8DEE7;
+  font-size: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #5A7D9A;
+  background: white;
+  cursor: pointer;
+  flex-shrink: 0;
+}
+
+.section-peek-btn.peeking {
+  background: #5A7D9A;
+  color: white;
+  border-color: #4F7CA8;
+}
+
+.section-number {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background-color: #5A7D9A;
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 13px;
+  font-weight: 700;
+  flex-shrink: 0;
+}
+
+.section-title-input {
+  flex: 1;
+  padding: 8px 12px;
+  background-color: white;
+  border: 1px solid #EEE;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 600;
+  color: #333;
+}
+
+.section-actions {
+  margin-top: 16px;
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.section-footer {
+  margin-top: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  font-size: 12px;
+  color: #999;
+}
+
+.collect-snippet-btn {
+  border: none;
+  border-radius: 12px;
+  background-color: #F5F5F4;
+  color: #333;
+  padding: 8px 16px;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.train-actions {
+  margin-top: 32px;
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.btn {
+  border: none;
+  border-radius: 12px;
+  padding: 10px 22px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.btn-secondary {
+  background-color: #F5F5F4;
+  color: #333;
+  border: 1px solid #E5E5E5;
+}
+
+.btn-secondary:active {
+  transform: scale(0.98);
+}
+
+.btn-primary {
+  background-color: #1A1A1A;
+  color: white;
+}
+
+.btn-primary:active {
+  transform: scale(0.98);
+}
+
+.section-title-input:focus {
+  border-color: #5A7D9A;
+}
+
+/* ====== 写作支架 ====== */
+.section-scaffolds {
+  margin-bottom: 12px;
+  padding: 12px;
+  background-color: white;
+  border-radius: 12px;
+  border: 1px solid #F0F0F0;
+}
+
+.scaffold-tags {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 8px;
+}
+
+.scaffold-tag {
+  padding: 4px 8px;
+  background-color: #F9F9F8;
+  border-radius: 6px;
+  font-size: 11px;
+  color: #666;
+  font-weight: 600;
+}
+
+.scaffold-structure {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.structure-label {
+  font-size: 11px;
+  color: #999;
+  font-weight: 600;
+  flex-shrink: 0;
+}
+
+.structure-text {
+  flex: 1;
+  font-size: 12px;
+  color: #5A7D9A;
+  line-height: 1.4;
+}
+
+.structure-switch {
+  padding: 4px 8px;
+  background-color: #F9F9F8;
+  border: 1px solid #EFEEEE;
+  border-radius: 6px;
+  font-size: 10px;
+  font-weight: 600;
+  color: #666;
+  flex-shrink: 0;
+}
+
+.structure-switch:active {
+  background-color: #F0F0F0;
+}
+
+/* ====== 段落输入框 ====== */
+.section-textarea {
+  width: 100%;
+  min-height: 180px;
+  padding: 16px;
+  background-color: white;
+  border: 1px solid #EEE;
+  border-radius: 12px;
+  font-size: 13px;
+  line-height: 1.6;
+  color: #333;
+  box-sizing: border-box;
+  font-family: inherit;
+  margin-bottom: 8px;
+}
+
+.section-textarea:focus {
+  border-color: #5A7D9A;
+  box-shadow: 0 0 0 1px #5A7D9A;
+}
+
+/* ====== 分论点底部操作区 ====== */
+.section-actions {
+  display: flex;
+  gap: 12px;
+  margin-bottom: 12px;
+}
+
+.section-actions .btn {
+  flex: 1;
+  height: 36px;
+  font-size: 12px;
+  padding: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 8px;
+}
+
+.section-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.char-count {
+  font-size: 11px;
+  color: #999;
+}
+
+.collect-snippet-btn {
+  padding: 6px 12px;
+  background-color: #F9F9F8;
+  border: 1px solid #EFEEEE;
+  border-radius: 8px;
+  font-size: 11px;
+  font-weight: 600;
+  color: #5A7D9A;
+  transition: all 0.2s;
+}
+
+.collect-snippet-btn:active {
+  background-color: #5A7D9A;
+  color: white;
+  transform: scale(0.95);
+}
+
+/* ====== 底部完成按钮 ====== */
+.train-actions {
+  margin-top: 20px;
+  display: flex;
+  justify-content: center;
+  padding-bottom: 40px;
+}
+
+.complete-btn {
+  background-color: #5A7D9A;
+  color: white;
+  font-size: 16px;
+  font-weight: 600;
+  padding: 12px 48px;
+  border-radius: 24px;
+  box-shadow: 0 4px 12px rgba(90, 125, 154, 0.3);
+  transition: all 0.2s;
+}
+
+.complete-btn:active {
+  transform: scale(0.98);
+  box-shadow: 0 2px 6px rgba(90, 125, 154, 0.2);
+}

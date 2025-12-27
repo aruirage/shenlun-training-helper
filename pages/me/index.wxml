@@ -1,0 +1,99 @@
+<view class="container">
+  <!-- 左侧导航（仅 Pad 显示） -->
+  <view class="sidebar" wx:if="{{isPad}}">
+    <view class="logo-wrap">
+      <text class="logo-main">笔杆子DIY</text>
+    </view>
+
+    <view class="nav-list">
+      <view 
+        wx:for="{{navItems}}" 
+        wx:key="name"
+        class="nav-item {{activeNav === item.name ? 'nav-active' : ''}}"
+        data-name="{{item.name}}"
+        data-route="{{item.route}}"
+        bindtap="onNavItemTap"
+      >
+        <text class="nav-icon">{{item.icon}}</text>
+        <text class="nav-text">{{item.name}}</text>
+      </view>
+    </view>
+
+    <view class="user-box">
+      <view class="avatar"></view>
+      <text class="user-name">用户名称</text>
+    </view>
+  </view>
+
+  <!-- 内容区域 -->
+  <view class="content">
+  <!-- 卡片 1：总体概览 -->
+  <view class="card summary-card">
+    <view class="card-title">本周概览</view>
+    <view class="stats-row">
+      <view class="stat-item">
+        <text class="stat-num">{{weekSummary.totalSessions}}</text>
+        <text class="stat-label">总练习</text>
+      </view>
+      <view class="stat-item">
+        <text class="stat-num">{{weekSummary.memoryItems}}</text>
+        <text class="stat-label">背诵条数</text>
+      </view>
+      <view class="stat-item">
+        <text class="stat-num">{{weekSummary.writingSessions}}</text>
+        <text class="stat-label">写作次数</text>
+      </view>
+    </view>
+  </view>
+
+  <!-- 卡片 2：按功能拆分 -->
+  <view class="card module-card">
+    <view class="card-title">功能统计</view>
+    <view class="module-list">
+      <view class="module-item">
+        <text class="module-name">分论点训练</text>
+        <text class="module-val">{{moduleStats.hotTrain.sessions}} 次</text>
+      </view>
+      <view class="module-item">
+        <text class="module-name">真题训练</text>
+        <text class="module-val">{{moduleStats.fullTrain.sessions}} 次</text>
+      </view>
+      <view class="module-item">
+        <text class="module-name">背诵学习</text>
+        <text class="module-val">{{moduleStats.memory.studyCount}} 条</text>
+      </view>
+      <view class="module-item">
+        <text class="module-name">测验次数</text>
+        <text class="module-val">{{moduleStats.memory.quizCount}} 次</text>
+      </view>
+      <view class="module-item">
+        <text class="module-name">测验正确率</text>
+        <text class="module-val">{{moduleStats.memory.quizCorrectRate * 100}}%</text>
+      </view>
+    </view>
+  </view>
+
+  <!-- 卡片 3：按主题/标签概览 -->
+  <view class="card topic-card">
+    <view class="card-title">主题掌握情况</view>
+    <view class="topic-list">
+      <view class="topic-header">
+        <text>主题</text>
+        <text>已掌握</text>
+        <text>待复习</text>
+      </view>
+      <block wx:for="{{topicStats}}" wx:key="topic">
+        <view class="topic-item">
+          <text class="topic-name">{{item.topic}}</text>
+          <text class="topic-val">{{item.mastered}}</text>
+          <text class="topic-val">{{item.toReview}}</text>
+        </view>
+      </block>
+    </view>
+  </view>
+
+  <view class="footer-action">
+    <button class="home-btn" bindtap="goHome">返回首页</button>
+  </view>
+  </view>
+</view>

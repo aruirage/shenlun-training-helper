@@ -1,0 +1,150 @@
+<!-- pages/materials/index.wxml - React Minimalist Materials Design -->
+
+<view class="materials-root">
+  <!-- iPad 三栏布局 -->
+  <view wx:if="{{isPad}}" class="materials-layout">
+    
+    <!-- 左侧导航栏 -->
+    <view class="materials-nav">
+      <view class="nav-header">
+        <view class="nav-icon">📚</view>
+        <text class="nav-title">素材库目录</text>
+      </view>
+      
+      <view class="nav-tree">
+        <view class="nav-group">
+          <view class="nav-group-header" bindtap="toggleNavItem" data-name="民生治理">
+            <text class="nav-group-title">民生治理</text>
+            <text class="nav-expand-icon">{{expandedNavItems.includes('民生治理') ? '▼' : '▶'}}</text>
+          </view>
+          <view class="nav-group-children" wx:if="{{expandedNavItems.includes('民生治理')}}">
+            <view class="nav-child {{selectedPolicy === '乡村振兴' ? 'active' : ''}}" bindtap="onPolicyTap" data-policy="乡村振兴">乡村振兴</view>
+            <view class="nav-child {{selectedPolicy === '共同富裕' ? 'active' : ''}}" bindtap="onPolicyTap" data-policy="共同富裕">共同富裕</view>
+            <view class="nav-child {{selectedPolicy === '社会治理' ? 'active' : ''}}" bindtap="onPolicyTap" data-policy="社会治理">社会治理</view>
+          </view>
+        </view>
+
+        <view class="nav-group">
+          <view class="nav-group-header" bindtap="toggleNavItem" data-name="科技创新">
+            <text class="nav-group-title">科技创新</text>
+            <text class="nav-expand-icon">{{expandedNavItems.includes('科技创新') ? '▼' : '▶'}}</text>
+          </view>
+          <view class="nav-group-children" wx:if="{{expandedNavItems.includes('科技创新')}}">
+            <view class="nav-child {{selectedPolicy === '数字中国' ? 'active' : ''}}" bindtap="onPolicyTap" data-policy="数字中国">数字中国</view>
+            <view class="nav-child {{selectedPolicy === '人工智能' ? 'active' : ''}}" bindtap="onPolicyTap" data-policy="人工智能">人工智能</view>
+            <view class="nav-child {{selectedPolicy === '大国重器' ? 'active' : ''}}" bindtap="onPolicyTap" data-policy="大国重器">大国重器</view>
+          </view>
+        </view>
+
+        <view class="nav-group">
+          <view class="nav-group-header" bindtap="toggleNavItem" data-name="生态环境">
+            <text class="nav-group-title">生态环境</text>
+            <text class="nav-expand-icon">{{expandedNavItems.includes('生态环境') ? '▼' : '▶'}}</text>
+          </view>
+          <view class="nav-group-children" wx:if="{{expandedNavItems.includes('生态环境')}}">
+            <view class="nav-child {{selectedPolicy === '绿色发展' ? 'active' : ''}}" bindtap="onPolicyTap" data-policy="绿色发展">绿色发展</view>
+            <view class="nav-child {{selectedPolicy === '碳达峰' ? 'active' : ''}}" bindtap="onPolicyTap" data-policy="碳达峰">碳达峰</view>
+            <view class="nav-child {{selectedPolicy === '美丽中国' ? 'active' : ''}}" bindtap="onPolicyTap" data-policy="美丽中国">美丽中国</view>
+          </view>
+        </view>
+      </view>
+    </view>
+
+    <!-- 中间列表区 -->
+    <view class="materials-main">
+      <!-- 顶部头部 -->
+      <view class="materials-header">
+        <view class="header-top">
+          <text class="header-title">素材浏览</text>
+          <view class="search-box">
+            <text class="search-icon">🔍</text>
+            <input type="text" class="search-input" placeholder="搜索关键词..." value="{{searchKeyword}}" bindinput="onSearchInput" />
+          </view>
+        </view>
+
+        <!-- 过滤 Chips -->
+        <view class="filter-chips">
+          <view class="chip" wx:for="{{selectedChips}}" wx:key="*this">
+            {{item}}
+            <text class="chip-close" bindtap="removeChip" data-value="{{item}}">×</text>
+          </view>
+        </view>
+
+        <!-- 类型 Tabs -->
+        <view class="type-tabs">
+          <view class="tab-item {{currentTypeIndex === index ? 'active' : ''}}" wx:for="{{typeList}}" wx:key="index" bindtap="onTypeChange" data-index="{{index}}">
+            {{item}}
+          </view>
+        </view>
+      </view>
+
+      <!-- 卡片列表 -->
+      <view class="materials-list">
+        <view class="material-card {{selectedMaterial && selectedMaterial._id === item._id ? 'selected' : ''}}" 
+              wx:for="{{filteredMaterials}}" wx:key="_id" 
+              bindtap="onMaterialTap" data-id="{{item._id}}">
+          <view class="card-header">
+            <text class="card-title">{{item.sourceTitle}}</text>
+            <text class="card-badge" style="color: {{item.typeColor}}; background-color: {{item.typeBg}};">{{item.typeLabel}}</text>
+          </view>
+          <view class="card-content">{{item.content}}</view>
+          <view class="card-footer">
+            <view class="card-meta">
+              <text class="meta-source">{{item.sourceName}}</text>
+              <text class="meta-date">{{item.sourceDate}}</text>
+            </view>
+            <view class="card-tag">{{item.policyDirection}}</view>
+          </view>
+        </view>
+
+        <!-- 空状态 -->
+        <view class="empty-state" wx:if="{{filteredMaterials.length === 0 && !isLoading}}">
+          <text class="empty-icon">📄</text>
+          <text class="empty-text">暂无此类素材</text>
+        </view>
+      </view>
+    </view>
+
+  </view>
+
+  <!-- 手机单栏布局 -->
+  <view wx:else class="phone-layout">
+    <view class="phone-header">
+      <text class="phone-title">素材浏览</text>
+      <view class="search-box">
+        <text class="search-icon">🔍</text>
+        <input type="text" class="search-input" placeholder="搜索关键词..." value="{{searchKeyword}}" bindinput="onSearchInput" />
+      </view>
+    </view>
+
+    <view class="filter-chips">
+      <view class="chip" wx:for="{{selectedChips}}" wx:key="*this">
+        {{item}}
+        <text class="chip-close" bindtap="removeChip" data-value="{{item}}">×</text>
+      </view>
+    </view>
+
+    <view class="type-tabs">
+      <view class="tab-item {{currentTypeIndex === index ? 'active' : ''}}" wx:for="{{typeList}}" wx:key="index" bindtap="onTypeChange" data-index="{{index}}">
+        {{item}}
+      </view>
+    </view>
+
+    <view class="materials-list">
+      <view class="material-card" wx:for="{{filteredMaterials}}" wx:key="_id" bindtap="onMaterialTap" data-id="{{item._id}}">
+        <view class="card-header">
+          <text class="card-title">{{item.sourceTitle}}</text>
+          <text class="card-badge" style="color: {{item.typeColor}}; background-color: {{item.typeBg}};">{{item.typeLabel}}</text>
+        </view>
+        <view class="card-content">{{item.content}}</view>
+        <view class="card-footer">
+          <view class="card-meta">
+            <text class="meta-source">{{item.sourceName}}</text>
+            <text class="meta-date">{{item.sourceDate}}</text>
+          </view>
+          <view class="card-tag">{{item.policyDirection}}</view>
+        </view>
+      </view>
+    </view>
+  </view>
+</view>

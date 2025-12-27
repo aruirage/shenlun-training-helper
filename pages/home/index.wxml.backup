@@ -1,0 +1,70 @@
+<view class="page">
+  <!-- 左侧导航（iPad 可固定，手机上可简化） -->
+  <view class="sidebar" wx:if="{{isPad}}">
+    <view class="sidebar-title">笔杆子助手</view>
+    <view class="nav-item nav-active">首页</view>
+    <view class="nav-item" bindtap="goToHotTraining">今日热点</view>
+    <view class="nav-item" bindtap="goToDiy">大作文训练</view>
+    <view class="nav-item" bindtap="goToMaterials">素材库</view>
+    <view class="nav-item" bindtap="goToMemory">背诵本</view>
+  </view>
+
+  <!-- 主内容 -->
+  <view class="main">
+    <!-- 欢迎卡片 -->
+    <view class="card welcome-card">
+      <view class="welcome-top">
+        <view class="welcome-text">
+          <view class="welcome-title">你好，笔杆子</view>
+          <view class="welcome-sub">今天也一起练一练申论写作吧</view>
+        </view>
+        <view class="welcome-progress">
+          <view class="progress-label">今日任务</view>
+          <view class="progress-value">复习 {{pendingReviewCount}} 条金句</view>
+          <view class="progress-date">{{currentDate}}</view>
+        </view>
+      </view>
+    </view>
+
+    <!-- 三个入口卡片 -->
+    <view class="entry-grid">
+      <view class="card entry-card" bindtap="goToHotTraining">
+        <view class="entry-title">今日热点 · 分论点训练</view>
+        <view class="entry-desc">围绕 3 个热点事件，拆分分论点，写一段高质量分析。</view>
+        <view class="entry-action">开始训练 ></view>
+      </view>
+
+      <view class="card entry-card" bindtap="goToDiy">
+        <view class="entry-title">写一篇大作文（真题）</view>
+        <view class="entry-desc">选择一套真题，从主论点到分论点，完整写一篇申论大作文。</view>
+        <view class="entry-action">进入真题 ></view>
+      </view>
+
+      <view class="card entry-card" bindtap="goToMemory">
+        <view class="entry-title">背诵本 · 金句 / 案例</view>
+        <view class="entry-desc">复习已加入的金句、案例和句式，用遮挡模式练记忆。</view>
+        <view class="entry-action">开始背诵 ></view>
+      </view>
+    </view>
+
+    <!-- 今日热点预览 / 最近练习 -->
+    <view class="section-header">
+      <view class="section-title">今日热点预览</view>
+      <view class="section-link" bindtap="goToHotTraining">全部热点 ></view>
+    </view>
+
+    <view class="topic-list">
+      <block wx:for="{{mockHotTopics}}" wx:key="topic">
+        <view class="card topic-card" data-topic="{{item.topic}}" bindtap="onViewTopic">
+          <view class="topic-title">{{item.topic}}</view>
+          <view class="topic-desc">{{item.desc}}</view>
+          <view class="topic-meta">
+            <view class="tag tag-field">{{item.materials[0].macroField}}</view>
+            <view class="tag tag-direction">{{item.materials[0].policyDirection}}</view>
+            <view class="tag tag-count">示例素材 {{item.materials.length}} 条</view>
+          </view>
+        </view>
+      </block>
+    </view>
+  </view>
+</view>

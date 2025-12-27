@@ -1,0 +1,13 @@
+{
+  "permissions": {
+    "openapi": [
+    ]
+  },
+  "envList": [
+    {
+      "envId": "cloud1-8g5opulvac39e1b2",
+      "alias": "dev"
+    }
+  ],
+  "functionUrl": ""
+}

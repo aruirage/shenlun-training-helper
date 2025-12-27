@@ -1,0 +1,266 @@
+<!-- pages/home/index.wxml - React Minimalist Design -->
+
+<view class="container">
+  <!-- iPad 三栏布局 -->
+  <view wx:if="{{isPad}}" class="home-layout">
+    
+    <!-- 左侧导航 -->
+    <view class="home-nav">
+      <view class="nav-header">
+        <view class="app-icon">📋</view>
+        <text class="app-name">申论 AI 助手</text>
+      </view>
+      
+      <view class="nav-list">
+        <view 
+          wx:for="{{navItems}}" 
+          wx:key="name"
+          class="nav-item {{activeNav === item.name ? 'active' : ''}}"
+          data-name="{{item.name}}"
+          data-route="{{item.route}}"
+          bindtap="onNavItemTap"
+        >
+          <text class="nav-item-icon">{{item.icon}}</text>
+          <text class="nav-item-text">{{item.name}}</text>
+        </view>
+      </view>
+    </view>
+
+    <!-- 中间主内容区 -->
+    <view class="home-main">
+      <view class="main-content">
+        
+        <!-- 欢迎卡片 -->
+        <view class="welcome-section">
+          <view class="welcome-left">
+            <view class="welcome-title">你好，{{userNickname || '同学'}}</view>
+            <view class="welcome-subtitle">今天的申论灵感已经准备好了，开始练习吧。</view>
+          </view>
+          <view class="welcome-right">
+            <view class="progress-label">
+              <text class="progress-label-text">TODAY</text>
+            </view>
+            <view class="progress-value">
+              <text class="progress-number">{{todayTasksCompleted}}/{{todayTasksTotal}}</text>
+              <text class="progress-unit">任务</text>
+            </view>
+            <view class="progress-ring">
+              <view class="ring-bg"></view>
+              <view class="ring-fill"></view>
+              <text class="ring-icon">🎯</text>
+            </view>
+          </view>
+          <view class="welcome-decoration">📚</view>
+        </view>
+
+        <!-- 三个快捷入口 -->
+        <view class="quick-actions">
+          <view 
+            wx:for="{{quickActions}}" 
+            wx:key="title"
+            class="action-card"
+            data-route="{{item.route}}"
+            bindtap="onQuickActionTap"
+          >
+            <view class="action-content">
+              <view class="action-icon" style="background-color: {{item.color}};">
+                <text class="action-icon-text">{{item.icon}}</text>
+              </view>
+              <view class="action-text">
+                <view class="action-title">{{item.title}}</view>
+                <view class="action-desc">{{item.desc}}</view>
+              </view>
+            </view>
+            <view class="action-arrow">
+              <view class="arrow-btn">→</view>
+            </view>
+          </view>
+        </view>
+
+        <!-- 最近练习 -->
+        <view class="recent-section">
+          <view class="section-header">
+            <text class="section-title">最近练习</text>
+            <text class="section-link" bindtap="goToHotTraining">查看全部</text>
+          </view>
+          <view class="exercise-list">
+            <view 
+              wx:for="{{recentExercises}}" 
+              wx:key="title"
+              class="exercise-item"
+              data-index="{{index}}"
+              bindtap="onExerciseTap"
+            >
+              <view class="exercise-left">
+                <view class="exercise-icon">🕐</view>
+                <view class="exercise-info">
+                  <view class="exercise-title">{{item.title}}</view>
+                  <view class="exercise-meta">
+                    <text class="exercise-tag">{{item.type}}</text>
+                    <text class="exercise-time">{{item.time}}</text>
+                  </view>
+                </view>
+              </view>
+              <view class="exercise-right">
+                <view class="exercise-status {{item.statusType}}">
+                  <text class="status-icon">{{item.statusType === 'completed' ? '✓' : '●'}}</text>
+                  <text class="status-text">{{item.status}}</text>
+                </view>
+                <text class="exercise-chevron">›</text>
+              </view>
+            </view>
+          </view>
+        </view>
+
+      </view>
+    </view>
+
+    <!-- 右侧辅助栏 -->
+    <view class="home-aside" wx:if="{{showRightPanel}}" style="width: {{rightPanelWidth}}px;">
+      <!-- 调整手柄 -->
+      <view 
+        class="resize-handle" 
+        catchtouchstart="startResize"
+        catchtouchmove="onResize"
+        catchtouchend="endResize">
+        <view class="resize-line"></view>
+      </view>
+      
+      <!-- 隐藏按钮 -->
+      <view class="panel-toggle-btn" bindtap="toggleRightPanel">
+        <text class="toggle-icon">›</text>
+      </view>
+      
+      <view class="aside-content">
+        
+        <!-- 今日提醒 -->
+        <view class="reminder-section">
+          <view class="aside-section-header">
+            <text class="aside-icon">💡</text>
+            <text class="aside-label">{{todayReminder.title}}</text>
+          </view>
+          <view class="reminder-list">
+            <view class="reminder-card primary" bindtap="onTodayReminderTap">
+              <view class="reminder-text">
+                {{todayReminder.text}}
+              </view>
+              <view class="reminder-action">
+                <text>{{todayReminder.actionText}}</text>
+                <text class="action-arrow-small">→</text>
+              </view>
+            </view>
+            <view class="reminder-card secondary">
+              <view class="reminder-text">
+                距离下次真题模拟练习还有 2 天，请保持手感。
+              </view>
+            </view>
+          </view>
+        </view>
+
+        <!-- 本周统计 -->
+        <view class="stats-section">
+          <view class="aside-section-header">
+            <view style="display: flex; align-items: center;">
+              <text class="aside-icon">📈</text>
+              <text class="aside-label">本周统计</text>
+            </view>
+            <text class="aside-link" bindtap="goToMe" style="font-size: 12px; color: #5A7D9A;">查看学习报告 ></text>
+          </view>
+          <view class="stats-grid">
+            <view class="stat-item">
+              <view class="stat-label">写文章</view>
+              <view class="stat-value">
+                <text class="stat-number">{{weekStats.essayCount}}</text>
+                <text class="stat-unit">篇</text>
+              </view>
+            </view>
+            <view class="stat-item">
+              <view class="stat-label">积累素材</view>
+              <view class="stat-value">
+                <text class="stat-number">{{weekStats.materialCount}}</text>
+                <text class="stat-unit">条</text>
+              </view>
+            </view>
+          </view>
+
+          <!-- 活跃度分布 -->
+          <view class="activity-chart">
+            <view class="chart-header">
+              <text class="chart-label">活跃度分布</text>
+              <text class="chart-growth">{{weekStats.weekGrowth}} 上周</text>
+            </view>
+            <view class="chart-bars">
+              <view 
+                wx:for="{{weekStats.activityData}}" 
+                wx:key="*this"
+                class="chart-bar {{index === 3 ? 'active' : ''}}"
+                style="height: {{item}}%;"
+              ></view>
+            </view>
+            <view class="chart-labels">
+              <text class="chart-day">Mon</text>
+              <text class="chart-day">Sun</text>
+            </view>
+          </view>
+        </view>
+
+      </view>
+    </view>
+
+  </view>
+
+  <!-- 显示按钮（当右侧栏隐藏时） -->
+  <view class="panel-show-btn" wx:if="{{!showRightPanel}}" bindtap="toggleRightPanel">
+    <text class="toggle-icon">‹</text>
+  </view>
+
+  <!-- 手机单栏布局 -->
+  <view wx:else class="phone-layout">
+    <view class="phone-welcome">
+      <view class="phone-greeting">
+        <text class="phone-greeting-text">你好，{{userNickname || '同学'}}</text>
+        <text class="phone-greeting-emoji">👋</text>
+      </view>
+      <view class="phone-progress">
+        <text class="phone-progress-text">今日任务 {{todayTasksCompleted}}/{{todayTasksTotal}}</text>
+      </view>
+    </view>
+
+    <view class="phone-actions">
+      <view 
+        wx:for="{{quickActions}}" 
+        wx:key="title"
+        class="phone-action-card"
+        data-route="{{item.route}}"
+        bindtap="onQuickActionTap"
+      >
+        <view class="phone-action-icon" style="background-color: {{item.color}};">
+          <text>{{item.icon}}</text>
+        </view>
+        <view class="phone-action-info">
+          <view class="phone-action-title">{{item.title}}</view>
+          <view class="phone-action-desc">{{item.desc}}</view>
+        </view>
+        <text class="phone-action-arrow">›</text>
+      </view>
+    </view>
+
+    <view class="phone-recent">
+      <view class="phone-section-title">最近练习</view>
+      <view 
+        wx:for="{{recentExercises}}" 
+        wx:key="title"
+        class="phone-exercise-item"
+        data-index="{{index}}"
+        bindtap="onExerciseTap"
+      >
+        <view class="phone-exercise-title">{{item.title}}</view>
+        <view class="phone-exercise-footer">
+          <text class="phone-exercise-tag">{{item.type}}</text>
+          <text class="phone-exercise-time">{{item.time}}</text>
+          <text class="phone-exercise-status {{item.statusType}}">{{item.status}}</text>
+        </view>
+      </view>
+    </view>
+  </view>
+</view>

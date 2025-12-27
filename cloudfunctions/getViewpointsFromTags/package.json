@@ -1,0 +1,15 @@
+{
+  "name": "getViewpointsFromTags",
+  "version": "1.0.0",
+  "description": "从素材库按3维标签聚合观点",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "wx-server-sdk": "~2.6.3"
+  }
+}

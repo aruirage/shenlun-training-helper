@@ -1,0 +1,163 @@
+<!-- pages/full-train/index.wxml - 重构版：手写支架式作文训练 -->
+<view class="full-train-container">
+  <!-- 左侧导航栏 -->
+  <view class="full-train-nav">
+    <view class="nav-header">
+      <view class="nav-logo">笔</view>
+      <view class="nav-title">申论 AI 助手</view>
+    </view>
+    <view class="nav-menu">
+      <view 
+        wx:for="{{navItems}}" 
+        wx:key="name"
+        class="nav-item {{activeNav === item.name ? 'active' : ''}}"
+        data-name="{{item.name}}"
+        data-route="{{item.route}}"
+        bindtap="onNavItemTap"
+      >{{item.name}}</view>
+    </view>
+  </view>
+
+  <!-- 中间主内容区 -->
+  <view class="full-train-main">
+    <view class="content-wrapper">
+      <!-- 题目卡片 -->
+      <view class="essay-card">
+        <view class="card-header">
+          <view class="chips-row">
+            <text class="chip chip-primary">{{essay.year}}</text>
+            <text class="chip chip-warning">{{essay.paperType}}</text>
+          </view>
+        </view>
+
+        <view class="card-body">
+          <view class="essay-title">{{essay.title}}</view>
+        </view>
+
+        <view class="card-footer">
+          <input 
+            type="text"
+            class="main-thesis-input"
+            placeholder="请用一句话概括你的总论点..."
+            value="{{mainArgument}}"
+            bindinput="onMainArgumentInput" />
+        </view>
+      </view>
+
+      <!-- 分论点写作区 -->
+      <view class="sections-panel">
+        <view class="sections-header">
+          <text class="sections-title">✍️ 分论点写作</text>
+          <text class="sections-count">{{completedCount}}/{{sections.length}}</text>
+        </view>
+
+        <view class="sections-list">
+          <view class="section-card" wx:for="{{sections}}" wx:key="id">
+            <!-- 头部：序号 + 标题输入 -->
+            <view class="section-header">
+              <text class="section-number">{{index + 1}}</text>
+              <input 
+                class="section-title-input"
+                placeholder="分论点 {{index + 1}}：输入核心观点..."
+                value="{{item.title}}"
+                data-id="{{item.id}}"
+                bindinput="onSectionTitleInput" />
+              <!-- 眼睛按钮隐藏/显示提示 -->
+              <view class="section-peek-btn {{item.showTip ? '' : 'peeking'}}" data-id="{{item.id}}" bindtap="toggleSectionTip">
+                {{item.showTip ? '👁️' : '✓'}}
+              </view>
+            </view>
+
+            <!-- 写作支架提示 -->
+            <view class="section-scaffolds" wx:if="{{item.showTip}}">
+              <view class="scaffold-tags">
+                <text class="scaffold-tag">领域：{{item.macroField}}</text>
+                <text class="scaffold-tag">方向：{{item.policyDirection}}</text>
+              </view>
+              <view class="scaffold-structure">
+                <text class="structure-label">段落骨架：</text>
+                <text class="structure-text">{{item.structureHint}}</text>
+                <button class="structure-switch" bindtap="switchStructureHint" data-id="{{item.id}}">换一套</button>
+              </view>
+            </view>
+
+            <!-- 段落输入框 -->
+            <textarea 
+              class="section-textarea"
+              placeholder="在这里写这一段申论内容..."
+              value="{{item.content}}"
+              data-id="{{item.id}}"
+              bindinput="onSectionInput"
+              maxlength="800" />
+            
+            <view class="section-actions">
+              <button class="btn btn-secondary" data-id="{{item.id}}" bindtap="saveSection">
+                💾 保存本段
+              </button>
+              <button class="btn btn-primary" data-id="{{item.id}}" bindtap="completeSection">
+                ✓ 完成本段
+              </button>
+            </view>
+
+            <!-- 底部操作区 -->
+            <view class="section-footer">
+              <text class="char-count">{{item.content.length}}/800</text>
+              <button 
+                class="collect-snippet-btn" 
+                bindtap="collectCommentSnippet" 
+                data-section-id="{{item.id}}"
+                wx:if="{{item.content.length > 10}}">
+                ⭐ 收藏精彩片段
+              </button>
+            </view>
+          </view>
+        </view>
+
+        <view class="train-actions">
+          <button class="btn btn-secondary" bindtap="previewFullEssay">预览全文</button>
+          <button class="btn btn-primary" bindtap="submitAiComment">提交AI点评</button>
+        </view>
+      </view>
+    </view>
+  </view>
+
+  <!-- 右侧材料区 -->
+  <view class="full-train-right {{showRightPanel ? '' : 'collapsed'}}" style="width: {{showRightPanel ? rightPanelWidth : 0}}px;">
+    <!-- 调整手柄 -->
+    <view 
+      class="resize-handle" 
+      catchtouchstart="startResize"
+      catchtouchmove="onResize"
+      catchtouchend="endResize">
+      <view class="resize-line"></view>
+    </view>
+    
+    <!-- 隐藏按钮 -->
+    <view class="panel-toggle-btn" bindtap="toggleRightPanel">
+      <text class="toggle-icon">{{showRightPanel ? '›' : '‹'}}</text>
+    </view>
+    
+    <view class="material-panel">
+      <view class="material-header">
+        <text class="material-title">📄 题目材料</text>
+        <view class="material-tools">
+          <button class="tool-btn-icon {{drawMode ? 'active' : ''}}" bindtap="toggleDrawMode">
+            {{drawMode ? '✓' : '✎'}}
+          </button>
+          <button class="tool-btn-icon" bindtap="collectEventMaterial">⭐</button>
+        </view>
+      </view>
+      
+      <view class="material-content">
+        <!-- 材料文本 -->
+        <view class="material-text">{{essay.materialSummary}}</view>
+        
+        <!-- 手写勾画层（预留） -->
+        <view wx:if="{{drawMode}}" class="material-overlay-canvas">
+          <text class="canvas-placeholder">手写勾画功能（Canvas 预留区域）</text>
+        </view>
+      </view>
+    </view>
+  </view>
+  
+</view>

@@ -1,0 +1,173 @@
+<!-- pages/hot-list/index.wxml - React Minimalist Hot Topics Design -->
+
+<view class="hot-list-root">
+  <!-- iPad 三栏布局 -->
+  <view wx:if="{{isPad}}" class="hot-layout">
+    
+    <!-- 左侧导航 -->
+    <aside class="hot-nav">
+      <view class="nav-header">
+        <view class="nav-icon">📋</view>
+        <text class="nav-title">申论 AI 助手</text>
+      </view>
+      
+      <nav class="nav-list">
+        <view 
+          wx:for="{{navItems}}" 
+          wx:key="name"
+          class="nav-item {{activeNav === item.name ? 'active' : ''}}"
+          data-name="{{item.name}}"
+          data-route="{{item.route}}"
+          bindtap="onNavItemTap"
+        >
+          <text class="nav-item-icon">{{item.icon}}</text>
+          <text class="nav-item-text">{{item.name}}</text>
+        </view>
+      </nav>
+    </aside>
+
+    <!-- 中间主内容区 -->
+    <main class="hot-main">
+      <view class="main-content">
+        
+        <!-- 页面头部 -->
+        <header class="page-header">
+          <view class="header-top">
+            <text class="page-title">今日热点</text>
+            <view class="header-date">
+              <text class="date-icon">📅</text>
+              <text class="date-text">{{currentDate}}</text>
+            </view>
+          </view>
+          <view class="page-subtitle">
+            每天精选 3 个时政热点，深度解析考点，助你完成分论点拆解练习。
+          </view>
+        </header>
+
+        <!-- 热点卡片列表 -->
+        <section class="topic-list">
+          <view 
+            wx:for="{{hotTopics}}" 
+            wx:key="id"
+            class="topic-card"
+            data-id="{{item.id}}"
+            bindtap="goToTrain"
+          >
+            <view class="card-header">
+              <text class="card-title">{{item.title}}</text>
+              <view class="card-arrow">›</view>
+            </view>
+            
+            <view class="card-summary">{{item.summary}}</view>
+
+            <view class="card-footer">
+              <view class="card-meta">
+                <text class="meta-badge">{{item.source}}</text>
+                <text class="meta-date">{{item.date}}</text>
+              </view>
+              <view class="card-field">{{item.field}}</view>
+            </view>
+          </view>
+        </section>
+
+      </view>
+    </main>
+
+    <!-- 右侧辅助栏 -->
+    <aside class="hot-aside {{showRightPanel ? '' : 'collapsed'}}" style="width: {{showRightPanel ? rightPanelWidth : 44}}px;">
+      <!-- 调整手柄 -->
+      <view 
+        class="resize-handle" 
+        catchtouchstart="startResize"
+        catchtouchmove="onResize"
+        catchtouchend="endResize">
+        <view class="resize-line"></view>
+      </view>
+      
+      <!-- 隐藏按钮 -->
+      <view class="panel-toggle-btn" bindtap="toggleRightPanel">
+        <text class="toggle-icon">{{showRightPanel ? '›' : '‹'}}</text>
+      </view>
+      
+      <view class="aside-content">
+        
+        <!-- 训练流程说明 -->
+        <section class="training-section">
+          <view class="section-header">
+            <text class="section-icon">ℹ️</text>
+            <text class="section-label">训练流程说明</text>
+          </view>
+          
+          <view class="steps-container">
+            <view 
+              wx:for="{{trainingSteps}}" 
+              wx:key="step"
+              class="step-item"
+            >
+              <view class="step-dot">
+                <view class="step-dot-inner"></view>
+              </view>
+              <view class="step-content">
+                <text class="step-title">{{item.title}}</text>
+                <text class="step-desc">{{item.desc}}</text>
+              </view>
+            </view>
+          </view>
+        </section>
+
+        <!-- 历史记录 -->
+        <section class="history-section">
+          <button class="history-btn" bindtap="viewHistory">
+            <text class="history-icon">⏱️</text>
+            <text class="history-text">回顾历史热点</text>
+            <text class="history-arrow">→</text>
+          </button>
+        </section>
+
+      </view>
+    </aside>
+
+  </view>
+
+  <!-- 手机单栏布局 -->
+  <view wx:else class="phone-layout">
+    <view class="phone-header">
+      <view class="header-top">
+        <text class="page-title">今日热点</text>
+        <view class="header-date">
+          <text class="date-icon">📅</text>
+          <text class="date-text">{{currentDate}}</text>
+        </view>
+      </view>
+      <view class="page-subtitle">
+        每天精选 3 个时政热点，深度解析考点，助你完成分论点拆解练习。
+      </view>
+    </view>
+
+    <section class="topic-list">
+      <view 
+        wx:for="{{hotTopics}}" 
+        wx:key="id"
+        class="topic-card"
+        data-id="{{item.id}}"
+        bindtap="goToTrain"
+      >
+        <view class="card-header">
+          <text class="card-title">{{item.title}}</text>
+          <view class="card-arrow">›</view>
+        </view>
+        
+        <view class="card-summary">{{item.summary}}</view>
+
+        <view class="card-footer">
+          <view class="card-meta">
+            <text class="meta-badge">{{item.source}}</text>
+            <text class="meta-date">{{item.date}}</text>
+          </view>
+          <view class="card-field">{{item.field}}</view>
+        </view>
+      </view>
+    </section>
+  </view>
+
+</view>

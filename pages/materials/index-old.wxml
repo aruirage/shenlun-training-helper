@@ -1,0 +1,345 @@
+<!--pages/materials/index.wxml - 三栏素材浏览-->
+
+<!-- iPad 三栏布局 -->
+<view class="materials-root" wx:if="{{isPad}}">
+  <view class="pad-layout">
+    
+    <!-- 左侧：树状导航 -->
+    <view class="pad-col pad-nav">
+      <view class="nav-header">
+        <view class="nav-logo">📚</view>
+        <text class="nav-title">素材库目录</text>
+      </view>
+      
+      <!-- 领域导航树 -->
+      <view class="nav-tree">
+        <view class="nav-group">
+          <view class="nav-group-header" bindtap="toggleNavItem" data-name="民生">
+            <text class="nav-group-title">民生治理</text>
+            <text class="nav-expand-icon">{{expandedNavItems.indexOf('民生') > -1 ? '▼' : '▶'}}</text>
+          </view>
+          <view class="nav-group-children" wx:if="{{expandedNavItems.indexOf('民生') > -1}}">
+            <view class="nav-child-item {{selectedPolicy === '乡村振兴' ? 'active' : ''}}" bindtap="onPolicyNavTap" data-policy="乡村振兴">乡村振兴</view>
+            <view class="nav-child-item {{selectedPolicy === '共同富裕' ? 'active' : ''}}" bindtap="onPolicyNavTap" data-policy="共同富裕">共同富裕</view>
+            <view class="nav-child-item {{selectedSubDirection === '社会治理' ? 'active' : ''}}" bindtap="onSubDirectionNavTap" data-sub="社会治理">社会治理</view>
+          </view>
+        </view>
+
+        <view class="nav-group">
+          <view class="nav-group-header" bindtap="toggleNavItem" data-name="科技">
+            <text class="nav-group-title">科技创新</text>
+            <text class="nav-expand-icon">{{expandedNavItems.indexOf('科技') > -1 ? '▼' : '▶'}}</text>
+          </view>
+          <view class="nav-group-children" wx:if="{{expandedNavItems.indexOf('科技') > -1}}">
+            <view class="nav-child-item {{selectedPolicy === '数字政府' ? 'active' : ''}}" bindtap="onPolicyNavTap" data-policy="数字政府">数字政府</view>
+            <view class="nav-child-item {{selectedSubDirection === '人工智能' ? 'active' : ''}}" bindtap="onSubDirectionNavTap" data-sub="人工智能">人工智能</view>
+            <view class="nav-child-item {{selectedSubDirection === '新质生产力' ? 'active' : ''}}" bindtap="onSubDirectionNavTap" data-sub="新质生产力">新质生产力</view>
+          </view>
+        </view>
+
+        <view class="nav-group">
+          <view class="nav-group-header" bindtap="toggleNavItem" data-name="生态">
+            <text class="nav-group-title">生态环境</text>
+            <text class="nav-expand-icon">{{expandedNavItems.indexOf('生态') > -1 ? '▼' : '▶'}}</text>
+          </view>
+          <view class="nav-group-children" wx:if="{{expandedNavItems.indexOf('生态') > -1}}">
+            <view class="nav-child-item {{selectedPolicy === '生态保护' ? 'active' : ''}}" bindtap="onPolicyNavTap" data-policy="生态保护">生态保护</view>
+            <view class="nav-child-item {{selectedSubDirection === '绿色发展' ? 'active' : ''}}" bindtap="onSubDirectionNavTap" data-sub="绿色发展">绿色发展</view>
+            <view class="nav-child-item {{selectedSubDirection === '美丽中国' ? 'active' : ''}}" bindtap="onSubDirectionNavTap" data-sub="美丽中国">美丽中国</view>
+          </view>
+        </view>
+      </view>
+    </view>
+
+    <!-- 中间：列表区 -->
+    <view class="pad-col pad-list">
+      <!-- 顶部：标题 + 搜索 -->
+      <view class="list-header">
+        <view class="header-top">
+          <text class="header-title">素材浏览</text>
+          <view class="search-box">
+            <text class="search-icon">🔍</text>
+            <input type="text" class="search-input" placeholder="搜索关键词..." value="{{searchKeyword}}" bindinput="onSearchInput" bindconfirm="performSearch" />
+          </view>
+        </view>
+
+        <!-- 筛选 chips -->
+        <view class="filter-chips" wx:if="{{selectedChips.length > 0}}">
+          <view class="chip" wx:for="{{selectedChips}}" wx:key="*this">
+            {{item}}
+            <text class="chip-close" bindtap="removeChip" data-value="{{item}}">×</text>
+          </view>
+        </view>
+
+        <!-- 类型 Tabs -->
+        <view class="type-tabs-row">
+          <view class="tab-item {{currentTypeIndex === index ? 'active' : ''}}" wx:for="{{typeList}}" wx:key="index" bindtap="onTypeNavChange" data-index="{{index}}">
+            {{item}}
+          </view>
+        </view>
+      </view>
+
+      <!-- 素材卡片列表 -->
+      <view class="materials-list-scroll">
+        <view class="material-card" wx:for="{{filteredMaterials}}" wx:key="_id" bindtap="onMaterialTap" data-id="{{item._id}}">
+          <view class="card-header">
+            <text class="card-title">{{item.title}}</text>
+            <view class="card-type-badge {{item.typeClass}}">{{item.typeShort}}</view>
+          </view>
+          <view class="card-content">{{item.content}}</view>
+          <view class="card-footer">
+            <view class="card-meta">
+              <text class="meta-source">{{item.displaySource}}</text>
+              <text class="meta-date">{{item.displayDate}}</text>
+            </view>
+            <view class="card-tag">{{item.policyDirection || item.macroField}}</view>
+          </view>
+        </view>
+
+        <!-- 空状态 -->
+        <view class="empty-state" wx:if="{{filteredMaterials.length === 0 && !isLoading}}">
+          <text class="empty-icon">📭</text>
+          <text class="empty-text">暂无此类素材</text>
+        </view>
+
+        <!-- 加载中 -->
+        <view class="loading" wx:if="{{isLoading}}">
+          <text>加载中...</text>
+        </view>
+      </view>
+    </view>
+
+    <!-- 右侧：详情区 -->
+    <view class="pad-col pad-detail">
+      <view class="detail-header">
+        <text class="detail-icon">📄</text>
+        <text class="detail-subtitle">MATERIAL DETAIL</text>
+      </view>
+
+      <view wx:if="{{selectedMaterial}}" class="detail-body">
+        <!-- 素材正文 -->
+        <view class="detail-section">
+          <view class="detail-label">素材正文</view>
+          <view class="detail-content-text">"{{selectedMaterial.content}}"</view>
+        </view>
+
+        <!-- 核心标签 -->
+        <view class="detail-section">
+          <view class="detail-label">核心标签</view>
+          <view class="detail-tags">
+            <view class="detail-tag" wx:if="{{selectedMaterial.macroField}}">{{selectedMaterial.macroField}}</view>
+            <view class="detail-tag" wx:if="{{selectedMaterial.policyDirection}}">{{selectedMaterial.policyDirection}}</view>
+            <view class="detail-tag" wx:for="{{selectedMaterial.tags || []}}" wx:key="*this">{{item}}</view>
+          </view>
+        </view>
+
+        <!-- 操作按钮 -->
+        <view class="detail-actions">
+          <view class="btn-bookmark" bindtap="addToMemory">
+            <text class="btn-icon">🔖</text>
+            <text>加入背诵本</text>
+          </view>
+        </view>
+
+        <!-- AI 建议 -->
+        <view class="detail-hint">
+          <text class="hint-icon">💡</text>
+          <view class="hint-text">此素材出自《{{selectedMaterial.title}}》，建议用于申论对策段落。</view>
+        </view>
+      </view>
+
+      <view wx:else class="detail-empty">
+        <text>👈 从左侧选择素材查看详情</text>
+      </view>
+    </view>
+  </view>
+</view>
+
+<!-- 手机单列布局 -->
+<view class="materials-root materials-container phone-layout" wx:else>
+  <!-- 顶部过滤条 -->
+  <view class="filter-section">
+    <!-- 第一行：宏观领域 + 政策方向 -->
+    <view class="filter-row">
+      <view class="filter-item">
+        <text class="filter-label">领域：</text>
+        <picker class="picker" mode="selector" range="{{macroFieldList}}" value="{{selectedMacroFieldIndex}}" bindchange="onMacroFieldChange">
+          <view class="picker-text">{{selectedMacroField}}</view>
+        </picker>
+      </view>
+      
+      <view class="filter-item">
+        <text class="filter-label">政策：</text>
+        <picker class="picker" mode="selector" range="{{policyList}}" value="{{selectedPolicyIndex}}" bindchange="onPolicyChange">
+          <view class="picker-text">{{selectedPolicy}}</view>
+        </picker>
+      </view>
+    </view>
+    
+    <!-- 第二行：分论点方向 + 类型 Tab -->
+    <view class="filter-row">
+      <view class="filter-item">
+        <text class="filter-label">分论点：</text>
+        <picker class="picker" mode="selector" range="{{subDirectionList}}" value="{{selectedSubDirectionIndex}}" bindchange="onSubDirectionChange">
+          <view class="picker-text">{{selectedSubDirection}}</view>
+        </picker>
+      </view>
+    </view>
+
+    <!-- 类型 Tab -->
+    <view class="type-tabs">
+      <view 
+        class="tab-item {{currentTypeIndex === index ? 'active' : ''}}" 
+        wx:for="{{typeList}}" 
+        wx:key="index"
+        data-index="{{index}}"
+        bindtap="onTypeChange">
+        {{item}}
+      </view>
+    </view>
+  </view>
+
+  <!-- 示例素材卡片（如果存在） -->
+  <view class="sample-material-section" wx:if="{{sampleMaterial}}">
+    <view class="sample-header">
+      <text class="sample-label">💡 来自首页热点示例</text>
+    </view>
+    <view class="sample-card">
+      <view class="sample-title">{{sampleMaterial.title}}</view>
+      <view class="sample-desc">{{sampleMaterial.content}}</view>
+      <view class="sample-footer">
+        <view class="sample-btn" bindtap="onAddMaterialTap" data-material="{{sampleMaterial}}" data-topic="首页示例">+ 加入素材库</view>
+      </view>
+    </view>
+  </view>
+
+  <!-- 素材列表 -->
+  <view class="materials-list">
+    <view class="material-block {{item.selected ? 'selected' : ''}}" 
+          wx:for="{{filteredMaterials}}" 
+          wx:key="_id"
+          bindtap="onMaterialTap"
+          data-id="{{item._id}}">
+      
+      <!-- 左侧复选框 -->
+      <view class="block-checkbox" catchtap="toggleMaterial" data-id="{{item._id}}">
+        <text wx:if="{{item.selected}}">✓</text>
+      </view>
+
+      <!-- 左侧彩色图标 -->
+      <view class="block-icon {{item.typeClass}}">
+        {{item.typeShort}}
+      </view>
+
+      <!-- 中间主体内容 -->
+      <view class="block-main">
+        <view class="block-title">{{item.title}}</view>
+        <view class="block-desc">{{item.content}}</view>
+      </view>
+
+      <!-- 右侧标签组 -->
+      <view class="block-tags">
+        <!-- 宏观领域标签 -->
+        <view class="tag tag-macro-{{item.macroFieldClass}}" wx:if="{{item.macroField}}">
+          {{item.macroField}}
+        </view>
+
+        <!-- 政策方向标签 -->
+        <view class="tag tag-policy" wx:if="{{item.policyDirection}}">
+          {{item.policyDirection}}
+        </view>
+
+        <!-- 分论点标签 -->
+        <view class="tag tag-sub" wx:if="{{item.subDirection}}">
+          {{item.subDirection}}
+        </view>
+
+        <!-- 类型标签 -->
+        <view class="tag tag-type-{{item.typeClass}}" wx:if="{{item.type}}">
+          {{item.type}}
+        </view>
+      </view>
+    </view>
+
+    <!-- 无数据提示 -->
+    <view class="empty-state" wx:if="{{filteredMaterials.length === 0 && !isLoading}}">
+      <text>📭 暂无素材</text>
+    </view>
+
+    <!-- 加载中 -->
+    <view class="loading" wx:if="{{isLoading}}">
+      <text>加载中...</text>
+    </view>
+
+    <!-- 下拉加载更多 -->
+    <view class="load-more" wx:if="{{hasMore && !isLoading}}" bindtap="loadMoreMaterials">
+      加载更多
+    </view>
+
+    <!-- 已加载全部提示 -->
+    <view class="no-more" wx:if="{{!hasMore && filteredMaterials.length > 0}}">
+      <text>已加载全部 (共 {{filteredMaterials.length}} 条)</text>
+    </view>
+  </view>
+
+  <!-- 底部操作栏（固定） -->
+  <view class="bottom-bar">
+    <view class="selected-info">
+      已选 <text class="count">{{selectedMaterials.length}}</text> 条
+    </view>
+    <view class="action-btn {{selectedMaterials.length === 0 ? 'disabled' : ''}}" bindtap="goToDiy">
+      去 DIY →
+    </view>
+  </view>
+  
+  <!-- 底部占位，防止内容被底部栏遮挡 -->
+  <view class="bottom-placeholder"></view>
+
+  <!-- 标签编辑抽屉 -->
+  <view class="drawer {{showTagDrawer ? 'show' : ''}}" bindtap="closeTagDrawer">
+    <view class="drawer-content" catchtap>
+      <view class="drawer-header">
+        <text>调整素材标签</text>
+        <text class="close-btn" bindtap="closeTagDrawer">✕</text>
+      </view>
+    
+      <view class="drawer-body">
+        <view class="drawer-hint">
+          仅调整本条素材的标签，不影响同分论点下其他素材
+        </view>
+      
+        <view class="editing-material-title">
+          {{editingMaterial.title}}
+        </view>
+      
+        <view class="drawer-item">
+          <text class="item-label">宏观领域</text>
+          <picker class="item-picker" mode="selector" range="{{editMacroFieldList}}" value="{{editMacroField}}" bindchange="onEditMacroFieldChange">
+            <view class="picker-display">{{editMacroFieldList[editMacroField]}}</view>
+          </picker>
+        </view>
+      
+        <view class="drawer-item">
+          <text class="item-label">政策方向</text>
+          <picker class="item-picker" mode="selector" range="{{editPolicyList}}" value="{{editPolicyDirection}}" bindchange="onEditPolicyChange">
+            <view class="picker-display">{{editPolicyList[editPolicyDirection]}}</view>
+          </picker>
+        </view>
+      
+        <view class="drawer-item">
+          <text class="item-label">分论点方向</text>
+          <picker class="item-picker" mode="selector" range="{{editSubDirectionList}}" value="{{editSubDirection}}" bindchange="onEditSubDirectionChange">
+            <view class="picker-display">{{editSubDirectionList[editSubDirection]}}</view>
+          </picker>
+        </view>
+      </view>
+    
+      <view class="drawer-footer">
+        <view class="btn btn-cancel" bindtap="closeTagDrawer">取消</view>
+        <view class="btn btn-submit {{isUpdatingTags ? 'loading' : ''}}" bindtap="submitTagUpdate">
+          {{isUpdatingTags ? '更新中...' : '确认更新'}}
+        </view>
+      </view>
+    </view>
+  </view>
+</view>
