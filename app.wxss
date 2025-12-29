@@ -1,23 +1,24 @@
 /* app.wxss */
 
-/* ===================== 马卡龙配色变量 ===================== */
+/* ===================== 高级配色变量 (基于设计稿) ===================== */
 page {
-  /* 主品牌色：柔和橙 */
-  --color-primary: #FB8159;
-  --color-primary-hover: #F98C53;
+  /* 主品牌色：清新绿 (9+X 风格) */
+  --color-primary: #34D399;
+  --color-primary-hover: #059669;
 
-  /* 辅助马卡龙色 */
-  --color-accent-green: #D2E0AA;
-  --color-accent-blue: #ABD7FB;
-  --color-accent-pink: #F9F2EF;
-  --color-accent-orange-soft: #FCCEB4;
-  --color-accent-green-soft: #D2E186;
+  /* 辅助配色 */
+  --color-accent-blue: #3B82F6;
+  --color-accent-purple: #8B5CF6;
+  --color-accent-dark: #1E293B;
+  --color-accent-grey: #94A3B8;
+  --color-accent-light: #F1F5F9;
+  --color-accent-yellow: #FCD34D;
 
   /* 背景 / 文本 */
-  --color-bg: #FEFEFE;
-  --color-bg-soft: #FDF7F2;
-  --color-text-main: #3A3A3A;
-  --color-text-muted: #9CA3AF;
+  --color-bg: #FFFFFF;
+  --color-bg-soft: #F8FAFC;
+  --color-text-main: #1E293B;
+  --color-text-muted: #94A3B8;
 
   /* 语义色 */
   --color-success: #10B981;

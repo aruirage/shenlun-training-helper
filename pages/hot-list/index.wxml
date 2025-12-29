@@ -1,173 +1,131 @@
-<!-- pages/hot-list/index.wxml - React Minimalist Hot Topics Design -->
-
-<view class="hot-list-root">
-  <!-- iPad 三栏布局 -->
-  <view wx:if="{{isPad}}" class="hot-layout">
+<view class="container">
+  <view class="home-layout">
     
     <!-- 左侧导航 -->
-    <aside class="hot-nav">
-      <view class="nav-header">
-        <view class="nav-icon">📋</view>
-        <text class="nav-title">申论 AI 助手</text>
+    <sidebar-nav activeNav="今日热点" userAvatar="{{userAvatar}}"></sidebar-nav>
+
+    <!-- 右侧主内容区 -->
+    <view class="home-main">
+      <!-- 顶部标题与搜索 -->
+      <view class="main-header">
+        <view class="header-left">
+          <view class="greeting">今日热点</view>
+          <view class="sub-greeting">结构化解读时政热点，快速沉淀申论素材。</view>
+        </view>
+        <view class="header-right">
+          <view class="search-bar">
+            <text class="search-icon">🔍</text>
+            <input class="search-input" placeholder="搜索热点..." placeholder-class="search-placeholder" />
+          </view>
+        </view>
       </view>
-      
-      <nav class="nav-list">
+
+      <view class="topic-list">
         <view 
-          wx:for="{{navItems}}" 
-          wx:key="name"
-          class="nav-item {{activeNav === item.name ? 'active' : ''}}"
-          data-name="{{item.name}}"
-          data-route="{{item.route}}"
-          bindtap="onNavItemTap"
+          wx:for="{{hotTopics}}" 
+          wx:key="id"
+          class="topic-card"
         >
-          <text class="nav-item-icon">{{item.icon}}</text>
-          <text class="nav-item-text">{{item.name}}</text>
+          <view class="card-content">
+            <view class="topic-info" bindtap="showFullTopic" data-index="{{index}}">
+              <view class="topic-title">{{item.title}}</view>
+              <view class="topic-summary">{{item.summary}}</view>
+              <view class="topic-footer">
+                <view class="topic-tags">
+                  <text wx:for="{{item.tags}}" wx:for-item="tag" wx:key="*this" class="tag">#{{tag}}</text>
+                </view>
+                <text class="topic-date">{{item.date}}</text>
+              </view>
+            </view>
+          </view>
         </view>
-      </nav>
-    </aside>
-
-    <!-- 中间主内容区 -->
-    <main class="hot-main">
-      <view class="main-content">
-        
-        <!-- 页面头部 -->
-        <header class="page-header">
-          <view class="header-top">
-            <text class="page-title">今日热点</text>
-            <view class="header-date">
-              <text class="date-icon">📅</text>
-              <text class="date-text">{{currentDate}}</text>
-            </view>
-          </view>
-          <view class="page-subtitle">
-            每天精选 3 个时政热点，深度解析考点，助你完成分论点拆解练习。
-          </view>
-        </header>
-
-        <!-- 热点卡片列表 -->
-        <section class="topic-list">
-          <view 
-            wx:for="{{hotTopics}}" 
-            wx:key="id"
-            class="topic-card"
-            data-id="{{item.id}}"
-            bindtap="goToTrain"
-          >
-            <view class="card-header">
-              <text class="card-title">{{item.title}}</text>
-              <view class="card-arrow">›</view>
-            </view>
-            
-            <view class="card-summary">{{item.summary}}</view>
-
-            <view class="card-footer">
-              <view class="card-meta">
-                <text class="meta-badge">{{item.source}}</text>
-                <text class="meta-date">{{item.date}}</text>
-              </view>
-              <view class="card-field">{{item.field}}</view>
-            </view>
-          </view>
-        </section>
-
-      </view>
-    </main>
-
-    <!-- 右侧辅助栏 -->
-    <aside class="hot-aside {{showRightPanel ? '' : 'collapsed'}}" style="width: {{showRightPanel ? rightPanelWidth : 44}}px;">
-      <!-- 调整手柄 -->
-      <view 
-        class="resize-handle" 
-        catchtouchstart="startResize"
-        catchtouchmove="onResize"
-        catchtouchend="endResize">
-        <view class="resize-line"></view>
-      </view>
-      
-      <!-- 隐藏按钮 -->
-      <view class="panel-toggle-btn" bindtap="toggleRightPanel">
-        <text class="toggle-icon">{{showRightPanel ? '›' : '‹'}}</text>
-      </view>
-      
-      <view class="aside-content">
-        
-        <!-- 训练流程说明 -->
-        <section class="training-section">
-          <view class="section-header">
-            <text class="section-icon">ℹ️</text>
-            <text class="section-label">训练流程说明</text>
-          </view>
-          
-          <view class="steps-container">
-            <view 
-              wx:for="{{trainingSteps}}" 
-              wx:key="step"
-              class="step-item"
-            >
-              <view class="step-dot">
-                <view class="step-dot-inner"></view>
-              </view>
-              <view class="step-content">
-                <text class="step-title">{{item.title}}</text>
-                <text class="step-desc">{{item.desc}}</text>
-              </view>
-            </view>
-          </view>
-        </section>
-
-        <!-- 历史记录 -->
-        <section class="history-section">
-          <button class="history-btn" bindtap="viewHistory">
-            <text class="history-icon">⏱️</text>
-            <text class="history-text">回顾历史热点</text>
-            <text class="history-arrow">→</text>
-          </button>
-        </section>
-
-      </view>
-    </aside>
-
-  </view>
-
-  <!-- 手机单栏布局 -->
-  <view wx:else class="phone-layout">
-    <view class="phone-header">
-      <view class="header-top">
-        <text class="page-title">今日热点</text>
-        <view class="header-date">
-          <text class="date-icon">📅</text>
-          <text class="date-text">{{currentDate}}</text>
-        </view>
-      </view>
-      <view class="page-subtitle">
-        每天精选 3 个时政热点，深度解析考点，助你完成分论点拆解练习。
       </view>
     </view>
-
-    <section class="topic-list">
-      <view 
-        wx:for="{{hotTopics}}" 
-        wx:key="id"
-        class="topic-card"
-        data-id="{{item.id}}"
-        bindtap="goToTrain"
-      >
-        <view class="card-header">
-          <text class="card-title">{{item.title}}</text>
-          <view class="card-arrow">›</view>
-        </view>
-        
-        <view class="card-summary">{{item.summary}}</view>
-
-        <view class="card-footer">
-          <view class="card-meta">
-            <text class="meta-badge">{{item.source}}</text>
-            <text class="meta-date">{{item.date}}</text>
-          </view>
-          <view class="card-field">{{item.field}}</view>
-        </view>
-      </view>
-    </section>
   </view>
 
+  <!-- 热点全文弹窗 -->
+  <view class="modal-overlay" wx:if="{{showTopicModal}}" bindtap="closeTopicModal">
+    <view class="modal-content" catchtap="true">
+      <view class="modal-header">
+        <text class="modal-title">热点详情</text>
+        <view class="close-btn" bindtap="closeTopicModal">×</view>
+      </view>
+      <scroll-view scroll-y class="modal-body">
+        <view class="full-topic-title">{{selectedTopic.title}}</view>
+        <view class="full-topic-date">{{selectedTopic.date}}</view>
+        <view class="full-topic-tags">
+          <text wx:for="{{selectedTopic.tags}}" wx:key="*this" class="tag">#{{item}}</text>
+        </view>
+        <view class="full-topic-content">
+          <text>{{selectedTopic.summary}}</text>
+          <!-- 这里可以放更详细的内容，目前先用summary代替 -->
+          <view style="margin-top: 20px; color: #6B7280; font-size: 14px; line-height: 1.8;">
+            这里是该热点的深度解读内容。通过对该政策/事件的结构化拆解，我们可以看到其背后的核心逻辑在于：
+            1. 坚持以人民为中心的发展思想，确保改革成果惠及全体人民。
+            2. 强化科技创新引领作用，为高质量发展注入新动能。
+            3. 完善基层治理体系，提升社会治理效能。
+          </view>
+        </view>
+
+        <!-- AI 生成素材展示区 (已移至弹窗内) -->
+        <view class="ai-materials-area-modal" wx:if="{{selectedTopic.materials && selectedTopic.materials.length > 0}}">
+          <view class="ai-materials-header">
+            <view class="header-left">
+              <text class="ai-spark">✨</text>
+              <text>AI 生成素材 ({{selectedTopic.materials.length}})</text>
+            </view>
+          </view>
+          
+          <scroll-view scroll-x class="materials-scroll-modal">
+            <view class="materials-row-modal">
+              <view 
+                class="material-mini-card" 
+                wx:for="{{selectedTopic.materials}}" 
+                wx:for-item="material" 
+                wx:for-index="mIdx" 
+                wx:key="id"
+                bindtap="goToMaterialDetail"
+                data-topicid="{{selectedTopic.id}}"
+                data-materialindex="{{mIdx}}"
+              >
+                <view class="mini-card-top">
+                  <text class="mini-tag">{{material.category}}</text>
+                  <text class="mini-type badge-type-{{material.type === '金句' ? 'jinju' : (material.type === '案例' ? 'anli' : (material.type === '政策' ? 'zhengce' : (material.type === '对策' ? 'duice' : 'pianduan')))}}">{{material.type}}</text>
+                </view>
+                <view class="mini-card-content">{{material.content}}</view>
+                <view class="mini-card-footer">
+                  <text class="mini-source">{{material.source}}</text>
+                  <view class="mini-actions">
+                    <view class="mini-prof">
+                      <view class="mini-prof-bar">
+                        <view class="mini-prof-fill" style="width: {{material.proficiency}}%"></view>
+                      </view>
+                    </view>
+                    <view class="btn-collect-mini" catchtap="addToLibraryFromModal" data-topicid="{{selectedTopic.id}}" data-materialindex="{{mIdx}}">
+                      <text>➕</text>
+                    </view>
+                  </view>
+                </view>
+              </view>
+            </view>
+          </scroll-view>
+        </view>
+      </scroll-view>
+      <view class="modal-footer">
+        <button 
+          class="btn-generate-modal {{selectedTopic.isGenerating ? 'loading' : ''}}" 
+          bindtap="generateAICase" 
+          data-id="{{selectedTopic.id}}"
+          disabled="{{selectedTopic.isGenerating}}"
+        >
+          <text class="btn-icon">✨</text>
+          <text>生成素材</text>
+        </button>
+        <button class="btn-primary-full" bindtap="goToTrain" data-id="{{selectedTopic.id}}">
+          <text>去训练</text>
+          <text class="btn-arrow">✈️</text>
+        </button>
+      </view>
+    </view>
+  </view>
 </view>

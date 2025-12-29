@@ -1,341 +1,129 @@
-// pages/viewpoints/index.js
+// pages/hot-train/index.js
 const { detectPad } = require('../../utils/device.js')
-const { logStudyEvent } = require('../../utils/logger.js')
 
 Page({
   data: {
-    isPad: false,
+    isPad: true,
     activeNav: '热点训练',
-    
-    // 右侧栏控制
-    showRightPanel: false,
-    rightPanelWidth: 360,
-    minRightPanelWidth: 300,
-    maxRightPanelWidth: 500,
-    isResizing: false,
-    
-    // 导航项
-    navItems: [
-      { name: '首页', icon: '🏠', route: '/pages/home/index' },
-      { name: '今日热点', icon: '🔥', route: '/pages/hot-list/index' },
-      { name: '热点训练', icon: '💪', route: '' },
-      { name: 'AI热点分论点点评', icon: '🤖', route: '/pages/comment/index' },
-      { name: '真题训练', icon: '✍️', route: '/pages/full-train/index' },
-      { name: '背诵本', icon: '🔖', route: '/pages/memory/index' },
-      { name: '我的', icon: '👤', route: '/pages/me/index' }
-    ],
-    
-    // 宏观领域Tab
-    macroFields: ['民生', '科技', '生态', '治理'],
-    currentMacroField: '民生',
-    currentMacroFieldIndex: 0,
-    
-    // 观点列表
-    mockViewpoints: [
-      {
-        macroField: '民生',
-        policyDirection: '乡村振兴',
-        subDirection: '产业',
-        subPointSentence: '推进乡村产业振兴，夯实中国式现代化根基。',
-        materialCount: 8
-      },
-      {
-        macroField: '民生',
-        policyDirection: '乡村振兴',
-        subDirection: '生态',
-        subPointSentence: '生态宜居是乡村振兴的重要内容，需要保护农业生产环境。',
-        materialCount: 6
-      },
-      {
-        macroField: '治理',
-        policyDirection: '数字政府',
-        subDirection: '治理',
-        subPointSentence: '数字技术赋能政府治理，提升公共服务质量。',
-        materialCount: 5
-      },
-      {
-        macroField: '科技',
-        policyDirection: '科技创新',
-        subDirection: '新质生产力',
-        subPointSentence: '发展新质生产力是推动高质量发展的必然要求。',
-        materialCount: 7
-      },
-      {
-        macroField: '生态',
-        policyDirection: '生态保护',
-        subDirection: '生态',
-        subPointSentence: '生态文明建设要因地制宜，科学规划。',
-        materialCount: 4
-      }
-    ],
-    
-    filteredViewpoints: [],
+    userAvatar: 'https://mgx-backend-cdn.metadl.com/generate/images/869485/2025-12-27/97908f92-7bdb-4515-8666-8093dcb25b5b.png',
 
-    // 训练模式：当前话题与分论点训练
-    currentTopic: {
-      title: '深化新时代数字乡村建设，绘就乡村振兴新画卷',
-      summary: '随着数字技术的飞速发展，农村地区正迎来前所未有的数字化转型机遇。通过“数字+”赋能产业、治理与服务，不仅能缩小城乡数字鸿沟，更能激活乡村发展的内生动力，让广大农民共享数字红利。',
-      source: '人民日报',
-      date: '2025-12-26',
-      field: '民生治理',
-      policy: '数字中国 / 乡村振兴'
-    },
-
-    // 分论点列表
-    trainingViewpoints: [
-      {
-        id: 1,
-        title: '分论点 1',
-        input: '',
-        paragraph: ''
-      },
-      {
-        id: 2,
-        title: '分论点 2',
-        input: '',
-        paragraph: ''
-      },
-      {
-        id: 3,
-        title: '分论点 3',
-        input: '',
-        paragraph: ''
-      }
-    ],
-
+    // 训练状态
+    statusTitle: '激发数字经济新动能',
+    topicTitle: '数字化赋能乡村治理',
+    goalText: '写出 2-3 个分论点段落，字数 80-200 字。',
+    materialSnippet: '数字化赋能乡村治理，是实现乡村振兴的关键一环。通过引入大数据、物联网等技术，可以实现对乡村资源的精准管理和高效配置...',
+    materialFull: '数字化赋能乡村治理，是实现乡村振兴的关键一环。通过引入大数据、物联网等技术，可以实现对乡村资源的精准管理和高效配置。例如，在环境监测方面，通过传感器实时监控水质和空气质量；在政务服务方面，通过“一网通办”让村民足不出户就能办理各项业务。这不仅提高了治理效率，也增强了村民的获得感和幸福感。',
+    showFullMaterial: false,
+    
     // 推荐素材
     recommendedMaterials: [
-      '赋能产业升级',
-      '缩小数字鸿沟',
-      '治理之基',
-      '内生动力',
-      '数字红利'
+      { type: '金句', icon: '⭐', content: '“数字经济是转型升级的‘新引擎’，更是民生保障的‘压舱石’。”' },
+      { type: '对策案例', icon: '✅', content: '浙江某地推广“一码办事”，将政务服务触角延伸至田间地头。' },
+      { type: '金句', icon: '⭐', content: '“以数字化转型驱动生产方式、生活方式和治理方式变革。”' },
+      { type: '对策案例', icon: '✅', content: '某市通过“城市大脑”实现交通拥堵指数下降15%。' },
+      { type: '政策', icon: '📜', content: '《关于加快推进数字乡村建设的指导意见》明确了阶段性目标。' },
+      { type: '金句', icon: '⭐', content: '“让数字红利惠及每一个偏远山村，不让一个人在数字时代掉队。”' },
+      { type: '对策案例', icon: '✅', content: '电商进农村工程带动农产品上行金额突破万亿元。' },
+      { type: '金句', icon: '⭐', content: '“数字技术与实体经济深度融合，是高质量发展的必由之路。”' },
+      { type: '对策案例', icon: '✅', content: '工业互联网平台连接设备数超过8000万台。' },
+      { type: '金句', icon: '⭐', content: '“数据要素的流动，正在重塑社会治理的每一个神经末梢。”' }
     ],
 
-    // 当前选中的分论点索引
-    selectedViewpointIndex: null,
-
-    // 当前段落输入
-    paragraphInput: ''
+    // 写作数据
+    activeTabIndex: 0,
+    tabs: ['分论点 1', '分论点 2', '分论点 3'],
+    paragraphs: [
+      '数字化赋能，要以‘精细化’提升公共服务触达率。',
+      '',
+      ''
+    ],
+    currentParagraph: '数字化赋能，要以‘精细化’提升公共服务触达率。',
+    wordCount: 23
   },
 
   onLoad(options) {
     this.detectDeviceType()
-    this.filterViewpoints()
   },
 
-  /**
-   * 检测设备类型
-   */
   detectDeviceType() {
     detectPad((isPad) => {
       this.setData({ isPad })
     })
   },
 
-  /**
-   * 切换宏观领域 Tab
-   */
-  onMacroFieldTab(e) {
-    const index = parseInt(e.currentTarget.dataset.index)
-    const field = this.data.macroFields[index]
+  toggleMaterialFull() {
     this.setData({
-      currentMacroFieldIndex: index,
-      currentMacroField: field
-    })
-    this.filterViewpoints()
+      showFullMaterial: !this.data.showFullMaterial
+    });
   },
 
-  /**
-   * 过滤观点列表
-   */
-  filterViewpoints() {
-    const filtered = this.data.mockViewpoints.filter(
-      v => v.macroField === this.data.currentMacroField
-    )
+  // 切换分论点 Tab
+  onTabTap(e) {
+    const index = e.currentTarget.dataset.index
+    const prevIndex = this.data.activeTabIndex
+    
+    // 保存当前段落
+    const paragraphs = this.data.paragraphs
+    paragraphs[prevIndex] = this.data.currentParagraph
+
     this.setData({
-      filteredViewpoints: filtered
+      activeTabIndex: index,
+      paragraphs: paragraphs,
+      currentParagraph: paragraphs[index],
+      wordCount: paragraphs[index].length
     })
   },
 
-  /**
-   * 点击分论点方向跳转到素材库
-   */
-  goToMaterialsWithFilter(e) {
-    const { macrofield, policydirection, subdirection } = e.currentTarget.dataset
-    wx.navigateTo({
-      url: `/pages/materials/index?macroField=${encodeURIComponent(macrofield)}&policyDirection=${encodeURIComponent(policydirection)}&subDirection=${encodeURIComponent(subdirection)}`
-    })
-  },
-
-  /**
-   * 选中分论点卡片
-   */
-  selectViewpoint(e) {
-    const { index } = e.currentTarget.dataset
+  // 输入监听
+  onInput(e) {
+    const value = e.detail.value
     this.setData({
-      selectedViewpointIndex: index,
-      paragraphInput: this.data.trainingViewpoints[index].paragraph || ''
+      currentParagraph: value,
+      wordCount: value.length
     })
   },
 
-  /**
-   * 分论点输入
-   */
-  onViewpointInput(e) {
-    const { index } = e.currentTarget.dataset
-    const { value } = e.detail
-    const trainingViewpoints = [...this.data.trainingViewpoints]
-    trainingViewpoints[index].input = value
-    this.setData({ trainingViewpoints })
-  },
-
-  /**
-   * 段落输入
-   */
-  onParagraphInput(e) {
-    this.setData({
-      paragraphInput: e.detail.value
-    })
-  },
-
-  /**
-   * 保存本段
-   */
-  saveParagraph() {
-    const { selectedViewpointIndex, paragraphInput, trainingViewpoints } = this.data
-    if (selectedViewpointIndex === null) return
-
-    trainingViewpoints[selectedViewpointIndex].paragraph = paragraphInput
-    this.setData({ trainingViewpoints })
-
+  // 完成本段
+  finishParagraph() {
+    const paragraphs = this.data.paragraphs
+    paragraphs[this.data.activeTabIndex] = this.data.currentParagraph
+    this.setData({ paragraphs })
+    
     wx.showToast({
-      title: '已保存',
-      icon: 'success',
-      duration: 1500
+      title: '本段已完成',
+      icon: 'success'
     })
   },
 
-  /**
-   * 完成本段
-   */
-  completeTraining() {
-    const { trainingViewpoints } = this.data
-    const filledCount = trainingViewpoints.filter(v => v.input.trim().length > 0).length
-    if (filledCount < 2) {
-      wx.showToast({
-        title: '请至少填写 2 个分论点',
-        icon: 'none'
-      })
-      return
-    }
+  // 返回上一页
+  goBack() {
+    wx.navigateBack()
+  },
 
+  // 暂存
+  saveDraft() {
+    this.finishParagraph()
     wx.showToast({
-      title: '训练完成',
-      icon: 'success',
-      duration: 2000
+      title: '已暂存',
+      icon: 'success'
     })
+  },
 
-    // 记录日志
-    logStudyEvent({
-      type: 'hot_train',
-      createdAt: Date.now()
-    })
-
+  // 生成 AI 点评
+  generateAIComment() {
+    wx.showLoading({ title: 'AI 正在分析中...' })
     setTimeout(() => {
-      wx.navigateBack()
+      wx.hideLoading()
+      wx.showToast({
+        title: '点评生成成功',
+        icon: 'success'
+      })
     }, 2000)
   },
 
-  /**
-   * 导航项点击处理
-   */
   onNavItemTap(e) {
     const { name, route } = e.currentTarget.dataset
-    if (route) {
-      wx.navigateTo({
-        url: route
-      })
-    }
-  },
-
-  /**
-   * 页面跳转
-   */
-  navigateTo(e) {
-    const { page } = e.currentTarget.dataset
-    if (page) {
-      wx.navigateTo({
-        url: page
-      })
-    }
-  },
-
-  /**
-   * 跳转到素材库
-   */
-  goToMaterials() {
-    wx.navigateTo({
-      url: '/pages/materials/index'
-    })
-  },
-
-  goToAiComment() {
-    wx.navigateTo({
-      url: '/pages/comment/index',
-      fail: () => {
-        wx.showToast({ title: '功能开发中', icon: 'none' })
-      }
-    })
-  },
-
-  previewFullText() {
-    wx.navigateTo({
-      url: '/pages/full-train/index',
-      fail: () => {
-        wx.showToast({ title: '预览页打开失败', icon: 'none' })
-      }
-    })
-  },
-
-  submitAiComment() {
-    this.goToAiComment()
-  },
-
-  /**
-   * 切换右侧栏显示/隐藏
-   */
-  toggleRightPanel() {
-    this.setData({
-      showRightPanel: !this.data.showRightPanel
-    })
-  },
-
-  /**
-   * 开始拖拽调整大小
-   */
-  startResize() {
-    this.setData({ isResizing: true })
-  },
-
-  /**
-   * 拖拽调整宽度
-   */
-  onResize(e) {
-    if (!this.data.isResizing) return
-    const { clientX } = e.touches[0]
-    const windowWidth = wx.getWindowSync().windowWidth
-    const newWidth = windowWidth - clientX - 240 // 240px = left nav width
-    const { minRightPanelWidth, maxRightPanelWidth } = this.data
-    if (newWidth >= minRightPanelWidth && newWidth <= maxRightPanelWidth) {
-      this.setData({ rightPanelWidth: newWidth })
-    }
-  },
-
-  /**
-   * 结束拖拽
-   */
-  endResize() {
-    this.setData({ isResizing: false })
+    if (name === '热点训练' || !route) return
+    wx.navigateTo({ url: route })
   }
 })

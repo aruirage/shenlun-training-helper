@@ -7,6 +7,7 @@ Page({
     currentDate: '',
     isPad: false,
     activeNav: '首页',
+    userAvatar: 'https://mgx-backend-cdn.metadl.com/generate/images/869485/2025-12-27/97908f92-7bdb-4515-8666-8093dcb25b5b.png',
     
     // 右侧栏控制
     showRightPanel: true,
@@ -15,26 +16,34 @@ Page({
     maxRightPanelWidth: 480,
     isResizing: false,
     
-    userName: '张同学',
-    userNickname: '',   // 显示在"你好，XXX"里的昵称
-    todayTasksCompleted: 2,
-    todayTasksTotal: 3,
-    pendingReviewCount: 5,
+    userName: '志在必得',
+    practiceDays: 14,
+    todayStats: {
+      total: 12, // 今日练习总次数
+      memory: 25, // 今日背诵完成条数
+      hot: 3     // 热点训练篇数
+    },
+    memoryProgress: 68,
+    aiSuggestion: "你本周在 ‘数字经济’ 话题练习较多，表达风格渐趋稳健；建议搭配 2 组 ‘民生类’ 案例，丰富论证维度。",
+    hotCount: 8,
+    pendingMemoryCount: 12,
+    weekTrend: [40, 65, 50, 85, 70, 45, 90], // 模拟练习趋势数据
     
     // 导航项
-    navItems: [
-      { name: '首页', icon: '🏠', route: '' },
+     navItems: [
+      { name: '首页', icon: '🏠', route: '/pages/home/index' },
       { name: '今日热点', icon: '🔥', route: '/pages/hot-list/index' },
-      { name: '热点训练', icon: '💪', route: '/pages/hot-train/index' },
-      { name: '真题训练', icon: '✍️', route: '/pages/full-train/index' },
+      { name: '热点训练', icon: '🖋️', route: '' },
+      { name: '素材库', icon: '📚', route: '/pages/materials/index' },
       { name: '背诵本', icon: '🔖', route: '/pages/memory/index' },
+      { name: 'AI建议', icon: '✨', route: '' },
       { name: '我的', icon: '👤', route: '/pages/me/index' }
     ],
     
     // 快捷操作
     quickActions: [
       { title: '今日热点', desc: '分论点强化训练', icon: '🔥', color: '#F1F5F9', route: '/pages/hot-list/index' },
-      { title: '大作文真题', desc: '限时模拟练题', icon: '✍️', color: '#F2F6F1', route: '/pages/full-train/index' },
+      { title: '分论点结构训练', desc: '限时模拟练题', icon: '✍️', color: '#F2F6F1', route: '/pages/hot-train/index' },
       { title: '背诵本', desc: '巩固已收藏金句', icon: '🔖', color: '#F5F2F9', route: '/pages/memory/index' }
     ],
     
@@ -135,10 +144,26 @@ Page({
     this.loadUserNickname()
     this.updateTodayReminder()
     this.updateWeekStats()
+    this.refreshStats()
   },
 
   onShow() {
     this.updateWeekStats()
+    this.refreshStats()
+  },
+
+  refreshStats() {
+    const stats = computeStatsFromLogs();
+    this.setData({
+      todayStats: {
+        total: stats.todayTotal,
+        memory: stats.todayMemory,
+        hot: stats.todayHot
+      },
+      practiceDays: stats.streakDays,
+      hotCount: stats.todayHot,
+      pendingMemoryCount: stats.todayMemory
+    });
   },
 
   /**
@@ -166,7 +191,7 @@ Page({
 
     // 如果本地没有，使用mock值或从云端获取
     // TODO: 接入真实用户系统后，从云函数获取用户信息
-    const mockNickname = '张同学'
+    const mockNickname = '志在必得'
     this.setData({ 
       userNickname: mockNickname,
       userName: mockNickname
@@ -238,7 +263,8 @@ Page({
     
     wx.navigateTo({
       url: route,
-      fail: () => {
+      fail: (err) => {
+        console.error('导航失败:', route, err);
         wx.showToast({ title: '功能开发中', icon: 'none' })
       }
     })
@@ -251,7 +277,8 @@ Page({
     const { route } = e.currentTarget.dataset
     wx.navigateTo({
       url: route,
-      fail: () => {
+      fail: (err) => {
+        console.error('导航失败:', route, err);
         wx.showToast({ title: '功能开发中', icon: 'none' })
       }
     })
@@ -274,10 +301,10 @@ Page({
   setCurrentDate() {
     const now = new Date()
     const year = now.getFullYear()
-    const month = String(now.getMonth() + 1).padStart(2, '0')
-    const day = String(now.getDate()).padStart(2, '0')
+    const month = now.getMonth() + 1
+    const day = now.getDate()
     this.setData({
-      currentDate: `${year}-${month}-${day}`
+      currentDate: `${year}年${month}月${day}日`
     })
   },
 
@@ -395,28 +422,26 @@ Page({
   },
 
   /**
-   * 跳转到热点训练页
+   * 跳转到热点列表
    */
-  goToHotTraining() {
+  goToHotList() {
     wx.navigateTo({
-      url: '/pages/hot-list/index',
-      fail: () => {
-        wx.showToast({
-          title: '功能开发中',
-          icon: 'none'
-        })
-      }
+      url: '/pages/hot-list/index'
     })
   },
 
   /**
-   * 跳转到大作文 DIY 页
+   * 跳转到热点训练页
    */
-  goToDiy() {
+  goToHotTrain() {
     wx.navigateTo({
-      url: '/pages/diy/index'
+      url: '/pages/hot-train/index',
+      fail: () => {
+        wx.showToast({ title: '功能开发中', icon: 'none' })
+      }
     })
   },
+
 
   /**
    * 跳转到素材库

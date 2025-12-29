@@ -1,99 +1,139 @@
 <view class="container">
-  <!-- 左侧导航（仅 Pad 显示） -->
-  <view class="sidebar" wx:if="{{isPad}}">
-    <view class="logo-wrap">
-      <text class="logo-main">笔杆子DIY</text>
-    </view>
+  <!-- 侧边导航栏 -->
+  <sidebar-nav activeNav="我的" userAvatar="{{userInfo.avatar}}"></sidebar-nav>
 
-    <view class="nav-list">
-      <view 
-        wx:for="{{navItems}}" 
-        wx:key="name"
-        class="nav-item {{activeNav === item.name ? 'nav-active' : ''}}"
-        data-name="{{item.name}}"
-        data-route="{{item.route}}"
-        bindtap="onNavItemTap"
-      >
-        <text class="nav-icon">{{item.icon}}</text>
-        <text class="nav-text">{{item.name}}</text>
-      </view>
-    </view>
-
-    <view class="user-box">
-      <view class="avatar"></view>
-      <text class="user-name">用户名称</text>
-    </view>
-  </view>
-
-  <!-- 内容区域 -->
-  <view class="content">
-  <!-- 卡片 1：总体概览 -->
-  <view class="card summary-card">
-    <view class="card-title">本周概览</view>
-    <view class="stats-row">
-      <view class="stat-item">
-        <text class="stat-num">{{weekSummary.totalSessions}}</text>
-        <text class="stat-label">总练习</text>
-      </view>
-      <view class="stat-item">
-        <text class="stat-num">{{weekSummary.memoryItems}}</text>
-        <text class="stat-label">背诵条数</text>
-      </view>
-      <view class="stat-item">
-        <text class="stat-num">{{weekSummary.writingSessions}}</text>
-        <text class="stat-label">写作次数</text>
-      </view>
-    </view>
-  </view>
-
-  <!-- 卡片 2：按功能拆分 -->
-  <view class="card module-card">
-    <view class="card-title">功能统计</view>
-    <view class="module-list">
-      <view class="module-item">
-        <text class="module-name">分论点训练</text>
-        <text class="module-val">{{moduleStats.hotTrain.sessions}} 次</text>
-      </view>
-      <view class="module-item">
-        <text class="module-name">真题训练</text>
-        <text class="module-val">{{moduleStats.fullTrain.sessions}} 次</text>
-      </view>
-      <view class="module-item">
-        <text class="module-name">背诵学习</text>
-        <text class="module-val">{{moduleStats.memory.studyCount}} 条</text>
-      </view>
-      <view class="module-item">
-        <text class="module-name">测验次数</text>
-        <text class="module-val">{{moduleStats.memory.quizCount}} 次</text>
-      </view>
-      <view class="module-item">
-        <text class="module-name">测验正确率</text>
-        <text class="module-val">{{moduleStats.memory.quizCorrectRate * 100}}%</text>
-      </view>
-    </view>
-  </view>
-
-  <!-- 卡片 3：按主题/标签概览 -->
-  <view class="card topic-card">
-    <view class="card-title">主题掌握情况</view>
-    <view class="topic-list">
-      <view class="topic-header">
-        <text>主题</text>
-        <text>已掌握</text>
-        <text>待复习</text>
-      </view>
-      <block wx:for="{{topicStats}}" wx:key="topic">
-        <view class="topic-item">
-          <text class="topic-name">{{item.topic}}</text>
-          <text class="topic-val">{{item.mastered}}</text>
-          <text class="topic-val">{{item.toReview}}</text>
+  <!-- 主内容区 -->
+  <scroll-view scroll-y class="main-content">
+    <view class="content-wrapper">
+      <!-- Header -->
+      <view class="header">
+        <view class="header-left">
+          <view class="avatar-container">
+            <image class="user-avatar-large" src="{{userInfo.avatar}}" mode="aspectFill"></image>
+            <view class="target-badge">
+              <text class="target-icon">🎯</text>
+            </view>
+          </view>
+          <view class="user-info">
+            <view class="name-row">
+              <text class="nickname">{{userInfo.nickname}}</text>
+              <view class="level-badge">{{userInfo.level}}</view>
+            </view>
+            <text class="motto">{{userInfo.motto}} —— 第{{userInfo.streakDays}}天打卡</text>
+          </view>
         </view>
-      </block>
-    </view>
-  </view>
+      </view>
 
-  <view class="footer-action">
-    <button class="home-btn" bindtap="goHome">返回首页</button>
-  </view>
-  </view>
+      <!-- Grid Layout -->
+      <view class="dashboard-grid">
+        <!-- Left Column -->
+        <view class="grid-left">
+          <!-- Week Stats Card -->
+          <view class="card stats-card">
+            <text class="card-label">本周复盘 ({{weekStats.range}})</text>
+            <view class="stats-row">
+              <view class="stat-item">
+                <text class="stat-label">训练次数</text>
+                <view class="stat-value-row">
+                  <text class="stat-value">{{weekStats.trainCount}}</text>
+                  <text class="stat-trend">{{weekStats.trainTrend}}</text>
+                </view>
+              </view>
+              <view class="stat-item">
+                <text class="stat-label">背诵时长</text>
+                <view class="stat-value-row">
+                  <text class="stat-value">{{weekStats.memoryTime}}</text>
+                  <text class="stat-unit">avg</text>
+                </view>
+              </view>
+              <view class="stat-item">
+                <text class="stat-label">AI 改写采纳</text>
+                <view class="stat-value-row">
+                  <text class="stat-value">{{weekStats.aiAdoption}}</text>
+                  <text class="stat-unit">次</text>
+                </view>
+              </view>
+            </view>
+
+            <!-- Distribution -->
+            <view class="distribution-section">
+              <text class="section-title">练习主题分布</text>
+              <view class="progress-bar-multi">
+                <view 
+                  wx:for="{{topicDistribution}}" 
+                  wx:key="name" 
+                  class="progress-segment" 
+                  style="width: {{item.percentage}}%; background-color: {{item.color}};"
+                ></view>
+              </view>
+              <view class="legend-row">
+                <view class="legend-item" wx:for="{{topicDistribution}}" wx:key="name" wx:if="{{index < 2}}">
+                  <view class="legend-dot" style="background-color: {{item.color}}"></view>
+                  <text>{{item.name}} {{item.percentage}}%</text>
+                </view>
+              </view>
+            </view>
+          </view>
+
+          <!-- Quick Links -->
+          <view class="quick-links">
+            <view class="link-card">
+              <view class="link-left">
+                <view class="link-icon-box bg-indigo">📖</view>
+                <view class="link-text">
+                  <text class="link-title">我的错题/弱项</text>
+                  <text class="link-subtitle">基于记忆曲线自动统计</text>
+                </view>
+              </view>
+              <text class="chevron">〉</text>
+            </view>
+            <view class="link-card">
+              <view class="link-left">
+                <view class="link-icon-box bg-emerald">📈</view>
+                <view class="link-text">
+                  <text class="link-title">模考记录</text>
+                  <text class="link-subtitle">查看历史评分趋势</text>
+                </view>
+              </view>
+              <text class="chevron">〉</text>
+            </view>
+          </view>
+        </view>
+
+        <!-- Right Column -->
+        <view class="grid-right">
+          <!-- AI Plan Card -->
+          <view class="card ai-plan-card">
+            <view class="ai-header">
+              <text class="sparkle-icon">✨</text>
+              <text>AI 下周练习计划建议</text>
+            </view>
+            <view class="ai-suggestions">
+              <view class="suggestion-item" wx:for="{{aiSuggestions}}" wx:key="title">
+                <text class="suggestion-title">{{item.title}}</text>
+                <text class="suggestion-content">{{item.content}}</text>
+              </view>
+            </view>
+            <view class="ai-glow-bg"></view>
+          </view>
+
+          <!-- Streak Card -->
+          <view class="card streak-card">
+            <view class="streak-header">
+              <text class="calendar-icon">📅</text>
+              <text>持续打卡 {{userInfo.streakDays}} 天</text>
+            </view>
+            <view class="streak-grid">
+              <view 
+                class="streak-dot {{item.active ? 'active' : ''}}" 
+                wx:for="{{streakGrid}}" 
+                wx:key="index"
+              ></view>
+            </view>
+            <text class="streak-footer">距离下一个里程碑「21天习惯养成」还有 7 天</text>
+          </view>
+        </view>
+      </view>
+    </view>
+  </scroll-view>
 </view>

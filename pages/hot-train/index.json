@@ -1,3 +1,10 @@
+
 {
-  "usingComponents": {}
+  "usingComponents": {
+    "sidebar-nav": "/component/sidebar-nav/index",
+    "comment-panel": "/component/comment-panel/index"
+  },
+  "navigationBarTitleText": "热点训练",
+  "navigationStyle": "custom"
 }
+

@@ -92,7 +92,30 @@ function computeStatsFromLogs() {
       moduleStats.memory.quizCorrectRate = (quizPassCount / moduleStats.memory.quizCount).toFixed(2);
     }
 
-    return { weekSummary, moduleStats };
+    // 计算今日统计
+    const todayStart = new Date().setHours(0, 0, 0, 0);
+    const todayLogs = logs.filter(log => log.createdAt >= todayStart);
+    const todayTotal = todayLogs.length;
+    const todayMemory = todayLogs.filter(log => log.type === 'memory').length;
+    const todayHot = todayLogs.filter(log => log.type === 'hot_train' || log.type === 'full_train').length;
+
+    // 计算连续天数 (简单实现)
+    let streakDays = 0;
+    const dateSet = new Set(logs.map(log => new Date(log.createdAt).toDateString()));
+    let checkDate = new Date();
+    while (dateSet.has(checkDate.toDateString())) {
+      streakDays++;
+      checkDate.setDate(checkDate.getDate() - 1);
+    }
+
+    return { 
+      weekSummary, 
+      moduleStats,
+      todayTotal,
+      todayMemory,
+      todayHot,
+      streakDays
+    };
 
   } catch (e) {
     console.error('Failed to compute stats:', e);

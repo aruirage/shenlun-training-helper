@@ -1,0 +1,44 @@
+<view class="container">
+  <view class="main-content">
+    <view class="header">
+      <view class="back-btn" bindtap="goBack">
+        <text>←</text>
+        <text>返回</text>
+      </view>
+      <view class="header-title">素材详情</view>
+    </view>
+
+    <view class="detail-card" wx:if="{{material}}">
+      <view class="card-top">
+        <view class="topic-tag">{{material.topic}}</view>
+        <view class="badge-type badge-type-{{typeMap[material.type] || 'gold'}}">{{material.type}}</view>
+      </view>
+
+      <view class="content-section">
+        <view class="serif-text">{{material.content}}</view>
+      </view>
+
+      <view class="card-footer">
+        <view class="source-info" wx:if="{{material.source}}">
+          来源：{{material.source}}
+        </view>
+        <view class="proficiency-box">
+          <view class="prof-label">掌握度</view>
+          <view class="prof-bar">
+            <view class="prof-fill" style="width: {{material.proficiency || 0}}%"></view>
+          </view>
+          <view class="prof-text">{{material.proficiency || 0}}%</view>
+        </view>
+      </view>
+
+      <view class="action-bar">
+        <view class="{{material.isCollected ? 'btn-collected' : 'btn-collect'}}" bindtap="toggleCollect">
+          {{material.isCollected ? '已收藏' : '收藏素材'}}
+        </view>
+        <view class="btn-train" bindtap="goToTrain">
+          开始背诵
+        </view>
+      </view>
+    </view>
+  </view>
+</view>

@@ -1,5 +1,7 @@
 {
-  "navigationBarTitleText": "热点训练",
-  "navigationBarBackgroundColor": "#D2E0AA",
-  "navigationBarTextStyle": "black"
+  "usingComponents": {
+    "sidebar-nav": "/component/sidebar-nav/index"
+  },
+  "navigationBarTitleText": "今日热点",
+  "navigationStyle": "custom"
 }

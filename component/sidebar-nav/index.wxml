@@ -1,0 +1,28 @@
+<!-- component/sidebar-nav/index.wxml -->
+<view class="sidebar-nav">
+  <view class="nav-top">
+    <view class="app-logo">
+      <view class="logo-placeholder">🖋️</view>
+    </view>
+    
+    <view class="nav-list">
+      <view 
+        wx:for="{{navItems}}" 
+        wx:key="name"
+        class="nav-item {{activeNav === item.name ? 'active' : ''}}"
+        data-name="{{item.name}}"
+        data-route="{{item.route}}"
+        bindtap="onNavItemTap"
+      >
+        <text class="nav-item-icon">{{item.icon}}</text>
+        <view class="active-indicator" wx:if="{{activeNav === item.name}}"></view>
+      </view>
+    </view>
+  </view>
+
+  <view class="nav-bottom">
+    <view class="user-avatar" bindtap="onUserTap">
+      <image src="{{userAvatar || '/assets/default-avatar.png'}}" mode="aspectFill"></image>
+    </view>
+  </view>
+</view>

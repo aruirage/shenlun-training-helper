@@ -1,242 +1,120 @@
-<!-- pages/hot-train/index.wxml - React Minimalist Hot Train Design -->
+<view class="container">
+  <!-- 侧边导航栏 (Global Sidebar) -->
+  <sidebar-nav activeNav="热点训练" userAvatar="{{userAvatar}}"></sidebar-nav>
 
-<view class="hot-train-root">
-  <!-- iPad 双栏布局 -->
-  <view wx:if="{{isPad}}" class="train-layout">
-    
-    <!-- 左侧导航 -->
-    <view class="train-nav">
-      <view class="nav-header">
-        <view class="nav-icon">📋</view>
-        <text class="nav-title">申论 AI 助手</text>
+  <!-- 主内容区 -->
+  <view class="main-wrapper">
+    <!-- Header -->
+    <header class="editor-header">
+      <view class="header-left">
+        <view class="back-btn" bindtap="goBack">
+          <text class="icon-chevron-left">〈</text>
+        </view>
+        <view class="divider-v"></view>
+        <view class="status-info">
+          <text class="zap-icon">⚡</text>
+          <text class="status-label">正在进行：</text>
+          <text class="status-text">{{statusTitle}}</text>
+        </view>
+        <view class="badge-training">分论点训练</view>
       </view>
-      
-      <view class="nav-list">
-        <view 
-          wx:for="{{navItems}}" 
-          wx:key="name"
-          class="nav-item {{activeNav === item.name ? 'active' : ''}}"
-          data-name="{{item.name}}"
-          data-route="{{item.route}}"
-          bindtap="onNavItemTap"
-        >{{item.name}}</view>
+      <view class="header-right">
+        <!-- 按钮已移至下方 -->
       </view>
-    </view>
+    </header>
 
-    <!-- 中间主内容区 -->
-    <main class="train-main">
-      <view class="main-content">
-        
-        <!-- 事件摘要卡片 -->
-        <section class="topic-card">
-          <text class="topic-title">{{currentTopic.title}}</text>
-          <text class="topic-summary">{{currentTopic.summary}}</text>
-          <view class="topic-meta">
-            <text class="meta-badge">{{currentTopic.source}}</text>
-            <text class="meta-date">{{currentTopic.date}}</text>
-            <view class="meta-divider"></view>
-            <text class="topic-field">{{currentTopic.field}}</text>
-            <text class="topic-policy">{{currentTopic.policy}}</text>
+    <view class="content-body">
+      <!-- Left: Context / Reference -->
+      <aside class="context-sidebar">
+        <view class="context-header">
+          <text class="context-title">推荐素材</text>
+          <view class="badge-outline">2 条</view>
+        </view>
+        <scroll-view scroll-y class="context-scroll">
+          <view class="material-cards">
+            <view class="material-card" wx:for="{{recommendedMaterials}}" wx:key="index">
+              <view class="card-tag">
+                <text class="tag-dot {{item.type === '金句' ? 'amber' : 'emerald'}}"></text>
+                <text class="tag-label">{{item.type}}</text>
+              </view>
+              <view class="card-content">
+                <text class="serif-text">{{item.content}}</text>
+              </view>
+            </view>
           </view>
-        </section>
+        </scroll-view>
+      </aside>
 
-        <!-- 分论点拆解练习 -->
-        <section class="practice-section">
-          <view class="practice-header">
-            <text class="practice-icon">✍️</text>
-            <text class="practice-title">分论点拆解练习</text>
+      <!-- Middle: Writing IDE -->
+      <main class="writing-ide">
+        <view class="ide-container">
+          <view class="ide-header">
+            <view class="topic-title">热点：{{topicTitle}}</view>
+            <view class="goal-text">目标：{{goalText}}</view>
           </view>
 
-          <view 
-            wx:for="{{trainingViewpoints}}" 
-            wx:key="id"
-            class="viewpoint-card {{selectedViewpointIndex === index ? 'active' : ''}}" 
-            data-index="{{index}}" 
-            bindtap="selectViewpoint"
-          >
-            <view class="viewpoint-header">
-              <text class="viewpoint-label {{selectedViewpointIndex === index ? 'on' : ''}}">分论点 {{index + 1}}</text>
-              <input 
-                class="viewpoint-input"
-                placeholder="请在此输入你提炼的分论点..."
-                value="{{item.input}}"
-                data-index="{{index}}"
-                bindinput="onViewpointInput"
-              />
+          <!-- 材料摘要与全文 -->
+          <view class="material-preview-section">
+            <view class="material-preview">
+              <text class="material-title">材料摘要</text>
+              <text class="material-snippet">{{materialSnippet}}</text>
+              <button class="material-more" bindtap="toggleMaterialFull">
+                {{showFullMaterial ? '收起材料' : '展开查看全文'}}
+              </button>
             </view>
 
-            <!-- 展开的编辑面板 -->
-            <view wx:if="{{selectedViewpointIndex === index}}" class="writing-panel">
-              <view class="writing-label">
-                <text>围绕这个分论点写一段话</text>
-                <text class="writing-sparkle">✨</text>
-              </view>
+            <scroll-view
+              wx:if="{{showFullMaterial}}"
+              scroll-y="true"
+              class="material-full"
+            >
+              <text class="material-full-text">{{materialFull}}</text>
+            </scroll-view>
+          </view>
 
-              <!-- 推荐素材 -->
-              <view class="recommend-row">
-                <text class="recommend-hint" bindtap="goToMaterials">推荐素材:</text>
-                <view class="recommend-chips">
-                  <view class="recommend-chip" wx:for="{{recommendedMaterials}}" wx:key="*this" bindtap="goToMaterials">
-                    {{item}}
+          <view class="tabs-container">
+            <view class="tabs-list">
+              <view 
+                class="tab-trigger {{activeTabIndex === index ? 'active' : ''}}" 
+                wx:for="{{tabs}}" 
+                wx:key="index"
+                bindtap="onTabTap"
+                data-index="{{index}}"
+              >
+                {{item}}
+              </view>
+            </view>
+            
+            <view class="editor-wrapper">
+              <textarea 
+                class="writing-textarea" 
+                placeholder="如：数字化赋能乡村治理，提升公共服务触达效率……" 
+                value="{{currentParagraph}}"
+                bindinput="onInput"
+                maxlength="1000"
+                placeholder-class="textarea-placeholder"
+              ></textarea>
+              
+              <view class="editor-actions">
+                <text class="word-count">已输入 {{wordCount}} 字</text>
+                <view class="actions-column">
+                  <view class="btn-outline-sm finish-btn" bindtap="finishParagraph">完成本段</view>
+                  <view class="secondary-actions">
+                    <view class="btn-ghost-sm" bindtap="saveDraft">
+                      <text class="icon-save">💾</text>
+                      <text>暂存</text>
+                    </view>
+                    <view class="btn-primary-sm" bindtap="generateAIComment">
+                      <text class="icon-sparkles">✨</text>
+                      <text>生成 AI 点评</text>
+                    </view>
                   </view>
                 </view>
               </view>
-
-              <!-- 多行编辑框 -->
-              <textarea 
-                class="paragraph-input" 
-                placeholder="在此展开论证..." 
-                value="{{paragraphInput}}" 
-                bindinput="onParagraphInput"
-              />
-
-              <!-- 按钮区域 -->
-              <view class="panel-actions">
-                <button class="btn btn-secondary" bindtap="saveParagraph">
-                  💾 保存本段
-                </button>
-                <button class="btn btn-primary" bindtap="completeTraining">
-                  ✓ 完成本段
-                </button>
-              </view>
-            </view>
-          </view>
-        </section>
-
-        <view class="train-action-bar">
-          <button class="btn btn-secondary" bindtap="previewFullText">预览全文</button>
-          <button class="btn btn-primary" bindtap="submitAiComment">提交AI点评</button>
-        </view>
-      </view>
-    </main>
-
-    <!-- 右侧辅助栏 -->
-      <aside class="train-aside {{showRightPanel ? '' : 'collapsed'}}" style="width: {{showRightPanel ? rightPanelWidth : 44}}px;">
-      <!-- 调整手柄 -->
-      <view 
-        class="resize-handle" 
-        catchtouchstart="startResize"
-        catchtouchmove="onResize"
-        catchtouchend="endResize">
-        <view class="resize-line"></view>
-      </view>
-      
-      <!-- 隐藏按钮 -->
-        <view class="panel-toggle-btn" bindtap="toggleRightPanel">
-          <text class="toggle-icon">{{showRightPanel ? '›' : '‹'}}</text>
-      </view>
-      
-      <view class="aside-content">
-
-        <section class="aside-section ai-comment-section">
-          <view class="section-header">
-            <text class="section-icon">🤖</text>
-            <text class="section-label">AI热点分论点点评</text>
-          </view>
-          <button class="ai-comment-btn" bindtap="goToAiComment">
-            <text class="ai-comment-title">查看 AI点评</text>
-            <text class="ai-comment-subtext">来自 AI综合评价的建议</text>
-          </button>
-        </section>
-        
-        <!-- 当前话题标签 -->
-        <section class="aside-section">
-          <view class="section-header">
-            <text class="section-icon">🏷️</text>
-            <text class="section-label">当前话题标签</text>
-          </view>
-          <view class="topic-tags">
-            <view class="tag" wx:for="{{currentTopic.policy.split(' / ')}}" wx:key="*this">{{item}}</view>
-          </view>
-        </section>
-
-        <!-- 提炼建议 -->
-        <section class="aside-section">
-          <view class="section-header">
-            <text class="section-icon">ℹ️</text>
-            <text class="section-label">提炼建议</text>
-          </view>
-          
-          <view class="advice-card">
-            <text class="advice-title">如何写好分论点？</text>
-            <view class="advice-list">
-              <view class="advice-item">
-                <text class="advice-number">1.</text>
-                <text class="advice-text">分论点应尽量采用"动词+宾语"或"小短句"的形式。</text>
-              </view>
-              <view class="advice-item">
-                <text class="advice-number">2.</text>
-                <text class="advice-text">三个分论点之间应具备并列或递进的逻辑关系。</text>
-              </view>
-              <view class="advice-item">
-                <text class="advice-number">3.</text>
-                <text class="advice-text">每个分论点要紧扣大标题的核心关键词。</text>
-              </view>
-            </view>
-          </view>
-        </section>
-
-      </view>
-    </aside>
-
-  </view>
-
-  <!-- 手机单栏布局 -->
-  <view wx:else class="phone-layout">
-    <view class="phone-header">
-      <text class="topic-title">{{currentTopic.title}}</text>
-    </view>
-
-    <view class="phone-content">
-      <section class="topic-card">
-        <text class="topic-summary">{{currentTopic.summary}}</text>
-        <view class="topic-meta">
-          <text class="meta-badge">{{currentTopic.source}}</text>
-          <text class="meta-date">{{currentTopic.date}}</text>
-          <text class="topic-field">{{currentTopic.field}}</text>
-        </view>
-      </section>
-
-      <section class="practice-section">
-        <view 
-          wx:for="{{trainingViewpoints}}" 
-          wx:key="id"
-          class="viewpoint-card {{selectedViewpointIndex === index ? 'active' : ''}}" 
-          data-index="{{index}}" 
-          bindtap="selectViewpoint"
-        >
-          <view class="viewpoint-header">
-            <text class="viewpoint-label">分论点 {{index + 1}}</text>
-            <input 
-              class="viewpoint-input"
-              placeholder="输入分论点..."
-              value="{{item.input}}"
-              data-index="{{index}}"
-              bindinput="onViewpointInput"
-            />
-          </view>
-
-          <view wx:if="{{selectedViewpointIndex === index}}" class="writing-panel">
-            <textarea 
-              class="paragraph-input" 
-              placeholder="展开论证..." 
-              value="{{paragraphInput}}" 
-              bindinput="onParagraphInput"
-            />
-            <view class="panel-actions">
-              <button class="btn btn-primary" bindtap="completeTraining">
-                完成
-              </button>
             </view>
           </view>
         </view>
-      </section>
-
-      <view class="train-action-bar">
-        <button class="btn btn-secondary" bindtap="previewFullText">预览全文</button>
-        <button class="btn btn-primary" bindtap="submitAiComment">提交AI点评</button>
-      </view>
+      </main>
     </view>
   </view>
-
 </view>

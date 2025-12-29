@@ -1,132 +1,127 @@
 // pages/memory/index.js
 const { detectPad } = require('../../utils/device.js')
-const { logStudyEvent, computeStatsFromLogs } = require('../../utils/logger.js')
-
-const CATEGORIES = ['全部', '金句', '案例', '对策']
+const { logStudyEvent } = require('../../utils/logger.js')
 
 Page({
   data: {
+    isPad: true,
     activeNav: '背诵本',
-    navItems: [
-      { name: '首页', icon: '🏠', route: '/pages/home/index' },
-      { name: '今日热点', icon: '🔥', route: '/pages/hot-list/index' },
-      { name: '热点训练', icon: '💪', route: '/pages/hot-train/index' },
-      { name: 'AI热点分论点点评', icon: '🤖', route: '/pages/comment/index' },
-      { name: '真题训练', icon: '✍️', route: '/pages/full-train/index' },
-      { name: '背诵本', icon: '📚', route: '' },
-      { name: '我的', icon: '👤', route: '/pages/me/index' }
-    ],
-    // 数据源（后面可以换成云端）
-    mockMemoryMaterials: [
+    userAvatar: 'https://mgx-backend-cdn.metadl.com/generate/images/869485/2025-12-27/97908f92-7bdb-4515-8666-8093dcb25b5b.png',
+
+    // 背诵状态
+    isFlipped: false,
+    peek: false,
+    currentIndex: 0,
+    totalCount: 12,
+    currentProgress: 4,
+    progressDots: [0, 1, 2, 3, 4, 5, 6, 7], // 固定8个进度点
+
+    // 素材列表
+    materials: [
       {
-        id: 'mem001',
+        id: 1,
         type: '金句',
-        field: '民生治理',
-        content: '数字乡村不仅是技术的下沉，更是治理的重塑与民生的回响。',
-        keywords: ['数字乡村', '治理的重塑'],
-        source: '人民日报',
+        topic: '文化强国',
+        backText: '文化是一个国家、一个民族的“灵魂”。在数字化转型的浪潮中，坚定“文化自信”方能行稳致远。',
+        usageTip: '常用于论述文化与科技结合、文化出海等主题的结尾升华段落。',
         memoryLevel: 1,
-        nextReviewAt: Date.now() - 1000,
-        lastReviewAt: Date.now() - 86400000,
-        isCoreForMemory: true,
-        structure: '不仅是...更是...',
-        meaning: '强调数字化不仅是硬件改变，核心在于治理逻辑和民众获得感的提升。',
-        usageTip: '适合作为分论点小结句'
+        reviewCount: 2
       },
       {
-        id: 'mem002',
+        id: 2,
         type: '案例',
-        field: '共同富裕',
-        content: '浙江“千万工程”数字化实践：通过“邻里码”实现办事不出村。',
-        keywords: ['千万工程', '邻里码'],
-        source: '求是网',
-        memoryLevel: 1,
-        nextReviewAt: Date.now() - 5000,
-        lastReviewAt: Date.now() - 86400000,
-        isCoreForMemory: false,
-        structure: '地名 + 做法 + 效果',
-        meaning: '体现数字化在基层治理和便民服务中的具体落地成效。',
-        usageTip: '可用在事实支撑段落'
-      },
-      {
-        id: 'mem003',
-        type: '对策',
-        field: '科技创新',
-        content: '要健全关键核心技术攻关新型举国体制，把政府、市场、社会有机结合起来。',
-        keywords: ['新型举国体制', '有机结合'],
-        source: '新华社',
+        topic: '乡村振兴',
+        backText: '浙江“千万工程”通过数字化手段实现了“精准治理”。通过邻里码、乡村大脑等工具，让办事不出村成为现实。',
+        usageTip: '适合作为事实论据，支撑数字化赋能基层治理的论点。',
         memoryLevel: 2,
-        nextReviewAt: Date.now() - 2000,
-        lastReviewAt: Date.now() - 172800000,
-        isCoreForMemory: true,
-        structure: '要...把...与...结合',
-        meaning: '强调科技创新要在体制机制上统筹各方力量。',
-        usageTip: '适合放在对策段首句'
+        reviewCount: 5
       },
       {
-        id: 'mem004',
+        id: 3,
         type: '金句',
-        field: '文化传承',
-        content: '坚持创造性转化、创新性发展，让收藏在博物馆里的文物“活”起来。',
-        keywords: ['创造性转化', '活起来'],
-        source: '人民网',
-        memoryLevel: 1,
-        nextReviewAt: Date.now() - 8000,
-        lastReviewAt: Date.now() - 86400000,
-        isCoreForMemory: true,
-        structure: '坚持...让...活起来',
-        meaning: '提出文化遗产工作的重要方法论。',
-        usageTip: '适合作为开头引题或结尾升华'
+        topic: '数字经济',
+        backText: '数据是新时代的“生产要素”，也是连接千家万户的“治理密码”。我们要以数字化转型驱动生产方式变革。',
+        usageTip: '适用于论述数据要素价值、智慧城市建设等话题。',
+        memoryLevel: 0,
+        reviewCount: 1
       },
       {
-        id: 'mem005',
-        type: '对策',
-        field: '生态文明',
-        content: '要像保护眼睛一样保护生态环境，像对待生命一样对待生态环境。',
-        keywords: ['保护眼睛', '对待生命'],
-        source: '光明日报',
-        memoryLevel: 1,
-        nextReviewAt: Date.now() + 86400000,
-        lastReviewAt: Date.now(),
-        isCoreForMemory: true,
-        structure: '要像...一样...，像...一样...',
-        meaning: '强调生态环境保护的极端重要性。',
-        usageTip: '适合用在收尾段落的强调句'
+        id: 4,
+        type: '政策',
+        topic: '高质量发展',
+        backText: '坚持以人民为中心的发展思想，切实增强人民群众的“获得感”、“幸福感”和“安全感”。',
+        usageTip: '申论大作文民生类话题的万能结尾句。',
+        memoryLevel: 3,
+        reviewCount: 8
       }
     ],
-
-    // 运行状态
-    isPad: false,
-    activeNav: '背诵本',
-
-    viewMode: 'study',       // 'study' | 'quiz'
-    categories: CATEGORIES,
-    currentCategory: '全部',
-    shuffleEnabled: false,
-
-    reviewList: [],
-    currentIndex: 0,
-    currentMaterial: null,
-
-    isFlipped: false,
-    isPeek: false,
-
-    showSettings: false,
-    weekReviewCount: 0,
-    pendingCount: 0,
-
-    // study 模式用：填空显示结构
-    displayParts: []
+    currentMaterial: null
   },
 
   onLoad() {
     this.detectDeviceType()
-    this.rebuildReviewList()
-    this.updateStats()
+    this.initMaterials()
+    this.updateCurrentMaterial()
   },
 
-  onShow() {
-    this.updateStats()
+  initMaterials() {
+    const OFFICIAL_WORDS = ['灵魂', '精准治理', '新引擎', '压舱石', '必由之路', '获得感', '幸福感', '安全感', '守正创新', '文化自信', '高质量发展', '新动能', '生产要素', '治理密码'];
+    
+    const materials = this.data.materials.map(m => {
+      const backText = m.backText;
+      let hiddenWords = [];
+      let segments = [];
+      
+      // 查找需要遮挡的词
+      let tempText = backText;
+      OFFICIAL_WORDS.forEach(word => {
+        if (tempText.includes(word) && hiddenWords.length < 2) {
+          hiddenWords.push(word);
+        }
+      });
+
+      if (hiddenWords.length === 0) {
+        const match = backText.match(/“(.+?)”/);
+        if (match) hiddenWords.push(match[1]);
+      }
+
+      // 将文本拆分为段落和遮挡块
+      let lastIdx = 0;
+      let sortedHidden = hiddenWords.sort((a, b) => backText.indexOf(a) - backText.indexOf(b));
+      
+      sortedHidden.forEach(word => {
+        const idx = backText.indexOf(word, lastIdx);
+        if (idx > -1) {
+          if (idx > lastIdx) {
+            segments.push({ text: backText.substring(lastIdx, idx), isHidden: false });
+          }
+          segments.push({ text: word, isHidden: true });
+          lastIdx = idx + word.length;
+        }
+      });
+      
+      if (lastIdx < backText.length) {
+        segments.push({ text: backText.substring(lastIdx), isHidden: false });
+      }
+
+      // 动态计算字号，确保不超出卡片
+      const textLength = backText.length;
+      let fontSize = 32;
+      if (textLength > 40) fontSize = 28;
+      if (textLength > 60) fontSize = 24;
+      if (textLength > 80) fontSize = 20;
+      if (textLength > 100) fontSize = 18;
+
+      return { 
+        ...m, 
+        backText,
+        segments, 
+        hiddenWord: hiddenWords.join('、'),
+        fontSize
+      };
+    });
+
+    this.setData({ materials, totalCount: materials.length });
   },
 
   detectDeviceType() {
@@ -135,222 +130,86 @@ Page({
     })
   },
 
-  updateStats() {
-    const stats = computeStatsFromLogs && computeStatsFromLogs()
-    if (stats && stats.moduleStats && stats.moduleStats.memory) {
-      this.setData({
-        weekReviewCount: stats.moduleStats.memory.studyCount + stats.moduleStats.memory.quizCount
-      })
-    }
-  },
-
-  // Fisher–Yates
-  shuffleArray(arr) {
-    const a = [...arr]
-    for (let i = a.length - 1; i > 0; i--) {
-      const j = Math.floor(Math.random() * (i + 1))
-      const tmp = a[i]
-      a[i] = a[j]
-      a[j] = tmp
-    }
-    return a
-  },
-
-  // 重建复习列表：按类别 + 时间 + 随机
-  rebuildReviewList() {
-    const now = Date.now()
-    let filtered = this.data.mockMemoryMaterials.filter(item => {
-      const categoryMatch =
-        this.data.currentCategory === '全部'
-          ? item.isCoreForMemory
-          : item.type === this.data.currentCategory
-      const timeMatch = item.nextReviewAt <= now
-      return categoryMatch && timeMatch
-    })
-
-    if (this.data.shuffleEnabled) {
-      filtered = this.shuffleArray(filtered)
-    }
-
-    this.setData(
-      {
-        reviewList: filtered,
-        currentIndex: 0,
-        isFlipped: false,
-        isPeek: false,
-        pendingCount: filtered.length
-      },
-      () => {
-        this.updateCurrentMaterial()
-      }
-    )
-  },
-
   updateCurrentMaterial() {
-    const material = this.data.reviewList[this.data.currentIndex] || null
-    if (!material) {
-      this.setData({
-        currentMaterial: null,
-        displayParts: []
-      })
-      return
-    }
-
-    // study 模式下用来做挖空
-    const regex = new RegExp(`(${material.keywords.join('|')})`, 'g')
-    const parts = material.content.split(regex).map(t => ({
-      text: t,
-      isKeyword: material.keywords.includes(t)
-    }))
-
+    const { materials, currentIndex } = this.data
+    const material = materials[currentIndex % materials.length];
+    
+    // 计算熟练度
+    const memoryLevel = material.memoryLevel || 0;
+    const reviewCount = material.reviewCount || 0;
+    const lastResult = material.lastResult || 0;
+    const proficiency = Math.min(100, 20 * memoryLevel + 5 * reviewCount + 20 * lastResult);
+    
     this.setData({
-      currentMaterial: material,
-      displayParts: parts
+      currentMaterial: { ...material, proficiency },
+      isFlipped: false,
+      peek: false
     })
-  },
-
-  // 记忆操作
-  handleMemoryAction(e) {
-    const action = e.currentTarget.dataset.action // 'pass' | 'fail'
-    const material = this.data.currentMaterial
-    if (!material) return
-
-    const now = Date.now()
-    let newLevel = material.memoryLevel
-    let daysToAdd = 1
-
-    if (action === 'fail') {
-      newLevel = 1
-      daysToAdd = 1
-    } else {
-      newLevel = Math.min(newLevel + 1, 3)
-      daysToAdd = newLevel === 2 ? 2 : newLevel === 3 ? 7 : 1
-    }
-
-    // 记 log
-    if (logStudyEvent) {
-      logStudyEvent({
-        type: 'memory',
-        mode: this.data.viewMode,
-        result: action,
-        materialId: material.id,
-        createdAt: now
-      })
-    }
-
-    const updated = this.data.mockMemoryMaterials.map(item =>
-      item.id === material.id
-        ? {
-            ...item,
-            memoryLevel: newLevel,
-            nextReviewAt: now + daysToAdd * 86400000,
-            lastReviewAt: now
-          }
-        : item
-    )
-
-    const nextIndex =
-      this.data.currentIndex < this.data.reviewList.length - 1
-        ? this.data.currentIndex + 1
-        : 0
-
-    const stillHas =
-      this.data.currentIndex < this.data.reviewList.length - 1
-        ? this.data.reviewList.length - (this.data.currentIndex + 1)
-        : 0
-
-    this.setData(
-      {
-        mockMemoryMaterials: updated,
-        weekReviewCount: this.data.weekReviewCount + 1,
-        currentIndex: nextIndex,
-        isFlipped: false,
-        isPeek: false,
-        pendingCount: stillHas
-      },
-      () => {
-        if (stillHas === 0) {
-          this.rebuildReviewList()
-        } else {
-          this.updateCurrentMaterial()
-        }
-      }
-    )
-  },
-
-  // 导航栏跳转
-  onNavItemTap(e) {
-    const { name, route } = e.currentTarget.dataset
-    if (route) {
-      wx.navigateTo({ url: route })
-    }
-  },
-
-  // 顶部、侧边交互
-  switchNav(e) {
-    const name = e.currentTarget.dataset.name
-    if (name === '首页') wx.navigateTo({ url: '/pages/home/index' })
-    if (name === '今日热点') wx.navigateTo({ url: '/pages/hot-list/index' })
-    if (name === '素材库') wx.navigateTo({ url: '/pages/materials/index' })
-  },
-
-  switchViewMode(e) {
-    const mode = e.currentTarget.dataset.mode
-    this.setData(
-      {
-        viewMode: mode,
-        isFlipped: false,
-        isPeek: false
-      },
-      () => {
-        // quiz 模式可以只测 memoryLevel>=2 的卡，后续需要可以在 rebuild 里加条件
-        this.rebuildReviewList()
-      }
-    )
   },
 
   toggleFlip() {
-    if (!this.data.currentMaterial) return
-    this.setData({ isFlipped: !this.data.isFlipped, isPeek: false })
-  },
-
-  startPeek() {
-    if (this.data.viewMode !== 'study') return
-    this.setData({ isPeek: true })
-  },
-
-  endPeek() {
-    this.setData({ isPeek: false })
-  },
-
-  togglePeek() {
-    this.setData({ isPeek: !this.data.isPeek })
-  },
-
-  toggleSettings() {
-    this.setData({ showSettings: !this.data.showSettings })
-  },
-
-  switchCategory(e) {
-    const cat = e.currentTarget.dataset.cat
-    this.setData({ currentCategory: cat }, () => {
-      this.rebuildReviewList()
+    this.setData({
+      isFlipped: !this.data.isFlipped
     })
   },
 
-  toggleShuffle() {
-    this.setData({ shuffleEnabled: !this.data.shuffleEnabled }, () => {
-      this.rebuildReviewList()
-    })
+  onPeekStart() {
+    this.setData({ peek: true })
   },
 
-  restartReview() {
-    this.setData({ currentCategory: '全部' }, () => {
-      this.rebuildReviewList()
-    })
+  onPeekEnd() {
+    this.setData({ peek: false })
   },
 
-  goToMe() {
-    wx.navigateTo({ url: '/pages/me/index' })
+  onPrev() {
+    let { currentIndex } = this.data
+    if (currentIndex > 0) {
+      this.setData({ currentIndex: currentIndex - 1 }, () => {
+        this.updateCurrentMaterial()
+      })
+    }
+  },
+
+  onNext() {
+    let { currentIndex, totalCount } = this.data
+    if (currentIndex < totalCount - 1) {
+      this.setData({ currentIndex: currentIndex + 1 }, () => {
+        this.updateCurrentMaterial()
+      })
+    }
+  },
+
+  onMastered() {
+    const material = this.data.currentMaterial;
+    logStudyEvent('memory_study', {
+      materialId: material.id,
+      result: 1
+    });
+    wx.showToast({ title: '已掌握', icon: 'success' })
+    this.onNext()
+  },
+
+  onNotRemembered() {
+    const material = this.data.currentMaterial;
+    logStudyEvent('memory_study', {
+      materialId: material.id,
+      result: 0
+    });
+    wx.showToast({ title: '需复习', icon: 'none' })
+    this.onNext()
+  },
+
+  onNavItemTap(e) {
+    const { name, route } = e.currentTarget.dataset
+    if (name === '背诵本' || !route) return
+    wx.navigateTo({ url: route })
+  },
+
+  refreshCurve() {
+    wx.showLoading({ title: '刷新中...' })
+    setTimeout(() => {
+      wx.hideLoading()
+      wx.showToast({ title: '曲线已更新' })
+    }, 1000)
   }
 })

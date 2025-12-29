@@ -1,6 +1,7 @@
 {
+  "usingComponents": {
+    "sidebar-nav": "/component/sidebar-nav/index"
+  },
   "navigationBarTitleText": "背诵本",
-  "navigationBarBackgroundColor": "#667eea",
-  "navigationBarTextStyle": "white",
-  "backgroundColor": "#f5f7fa"
+  "navigationStyle": "custom"
 }

@@ -1,21 +1,23 @@
 {
   "pages": [
     "pages/home/index",
-    "pages/hot/index",
     "pages/hot-list/index",
     "pages/materials/index",
     "pages/hot-train/index",
     "pages/full-train/index",
     "pages/memory/index",
     "pages/me/index",
+    "pages/web-view/index",
+    "pages/material-detail/index",
+    "pages/hot-detail/index",
     "pages/comment/index"
   ],
   "window": {
     "pageOrientation": "landscape",
-    "navigationBarTitleText": "申论训练助手",
-    "navigationBarBackgroundColor": "#FDF7F2",
+    "navigationBarTitleText": "笔杆子DIY助手",
+    "navigationBarBackgroundColor": "#FFFFFF",
     "navigationBarTextStyle": "black",
-    "backgroundColor": "#FDF7F2"
+    "backgroundColor": "#F8FAFF"
   },
   "sitemapLocation": "sitemap.json",
   "style": "v2"

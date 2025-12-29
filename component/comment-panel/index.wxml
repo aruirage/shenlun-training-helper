@@ -1,0 +1,162 @@
+<!-- components/comment-panel/index.wxml -->
+<view wx:if="{{visible}}" class="comment-panel">
+  <view class="content-inner">
+    <!-- 标题 -->
+    <view class="page-header">
+      <view class="page-title">
+        <text class="title-bar"></text>
+        <text class="title-text">训练结果总评</text>
+      </view>
+    </view>
+
+    <!-- AI 总评卡片 -->
+    <view class="evaluation-card">
+      <view class="card-top">
+        <view class="grade-section">
+          <view class="grade-badge">{{overallGrade}}</view>
+          <view class="grade-info">
+            <view class="grade-title">综合评级：{{overallGrade}}</view>
+            <view class="grade-subtitle">
+              分论点整体方向正确，结构基本完整，下面是逐项优化建议。
+            </view>
+          </view>
+        </view>
+
+        <!-- 维度评分 -->
+        <view class="dimensions-grid">
+          <view class="dimension-box" wx:for="{{dimensions}}" wx:key="name">
+            <view class="dimension-label">{{item.name}}</view>
+            <view class="dimension-score">
+              <view class="score-value">
+                {{item.score >= 90 ? 'A+' : item.score >= 85 ? 'A' : item.score >= 80 ? 'B+' : 'B'}}
+              </view>
+            </view>
+            <view class="dimension-comment">{{item.comment}}</view>
+          </view>
+        </view>
+      </view>
+
+      <!-- 分论点反馈 -->
+      <view class="feedback-section">
+        <view class="section-label">分论点深度评价</view>
+        <view class="feedback-list">
+          <view class="feedback-item" wx:for="{{viewpointFeedback}}" wx:key="title">
+            <view class="feedback-status {{item.score >= 85 ? 'status-excellent' : item.score >= 80 ? 'status-good' : 'status-fair'}}">
+              {{item.score >= 85 ? '优' : item.score >= 80 ? '平' : '缺'}}
+            </view>
+            <view class="feedback-content">
+              <view class="feedback-title">{{item.title}}</view>
+              <view class="feedback-comment">{{item.comment}}</view>
+            </view>
+            <view class="feedback-arrow">›</view>
+          </view>
+        </view>
+      </view>
+    </view>
+
+    <!-- 评论参考与推荐素材 -->
+    <view class="reference-section">
+      <view wx:if="{{!referenceExpanded}}" class="expand-placeholder" bindtap="toggleReference">
+        <view class="expand-icon">⌄</view>
+        <view class="expand-text">查看评论分论点参考与推荐素材</view>
+      </view>
+
+      <view wx:if="{{referenceExpanded}}" class="expanded-content">
+        <!-- 评论核心分论点 -->
+        <view class="reference-subsection">
+          <view class="subsection-title">
+            <text class="title-icon">📈</text>
+            <text class="title-text">评论核心分论点参考</text>
+          </view>
+          <view class="viewpoints-grid">
+            <view class="viewpoint-card" wx:for="{{referenceViewpoints}}" wx:key="title">
+              <view class="viewpoint-header">
+                <view class="viewpoint-title">{{item.title}}</view>
+                <view class="match-badge {{item.match === '高度一致' ? 'match-high' : item.match === '部分覆盖' ? 'match-medium' : 'match-low'}}">
+                  {{item.match}}
+                </view>
+              </view>
+              <view class="viewpoint-desc">{{item.explanation}}</view>
+            </view>
+          </view>
+        </view>
+
+        <!-- 推荐素材 -->
+        <view class="reference-subsection">
+          <view class="subsection-title">
+            <text class="title-icon">📚</text>
+            <text class="title-text">针对性补强素材推荐</text>
+          </view>
+          <view class="materials-list">
+            <view
+              class="material-item {{item.selected ? 'selected' : ''}}"
+              wx:for="{{recommendedMaterials}}"
+              wx:key="id"
+              bindtap="selectMaterial"
+              data-id="{{item.id}}"
+            >
+              <view class="material-checkbox" catchtap="toggleMaterial" data-id="{{item.id}}">
+                <text wx:if="{{item.selected}}">✓</text>
+              </view>
+              <view class="material-main">
+                <view class="material-header">
+                  <view class="chip {{item.typeClass}}">{{item.type}}</view>
+                  <view class="material-date">{{item.date}}</view>
+                </view>
+                <view class="material-text">{{item.content}}</view>
+                <view class="material-meta">
+                  <text class="meta-source">{{item.source}}</text>
+                </view>
+              </view>
+            </view>
+          </view>
+        </view>
+      </view>
+    </view>
+  </view>
+
+  <!-- 底部工具栏 -->
+  <view class="bottom-toolbar" wx:if="{{referenceExpanded}}">
+    <view class="toolbar-content">
+      <view class="selected-info">
+        <text class="check-icon">✓</text>
+        <text class="selected-text">
+          已选 <text class="count">{{selectedCount}}</text> 条素材
+        </text>
+      </view>
+      <button class="btn-add" bindtap="addToLibrary">加入我的素材库</button>
+    </view>
+  </view>
+
+  <!-- 右侧详情（在平板或大屏中效果更好，但组件里直接写成右侧抽屉样式即可） -->
+  <view wx:if="{{selectedMaterial}}" class="comment-aside">
+    <view class="aside-header">
+      <view class="chip {{selectedMaterial.typeClass}}">{{selectedMaterial.type}}</view>
+      <view class="aside-date">{{selectedMaterial.date}}</view>
+    </view>
+
+    <view class="aside-title">素材详情</view>
+
+    <view class="aside-quote">"{{selectedMaterial.content}}"</view>
+
+    <view class="aside-meta">
+      <view class="meta-row">
+        <text class="meta-label">来源</text>
+        <text class="meta-value">{{selectedMaterial.source}}</text>
+      </view>
+    </view>
+
+    <view class="aside-tip">
+      <text class="tip-icon">✨</text>
+      <view class="tip-content">
+        <view class="tip-label">使用建议</view>
+        <view class="tip-text">
+          该素材适合作为本分论点的开头或论证句，用来把“数字化”与“民生福祉”建立联系。
+        </view>
+      </view>
+    </view>
+
+    <button class="btn-bookmark" bindtap="addToMemoryFromSelected">🔖 加入背诵本</button>
+    <button class="btn-link" bindtap="openSourceLink">🔗 查看原文出处</button>
+  </view>
+</view>
