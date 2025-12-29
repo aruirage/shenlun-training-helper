@@ -261,7 +261,7 @@ Page({
       return
     }
     
-    wx.navigateTo({
+    wx.reLaunch({
       url: route,
       fail: (err) => {
         console.error('导航失败:', route, err);

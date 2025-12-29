@@ -33,7 +33,7 @@ Component({
         return;
       }
 
-      wx.navigateTo({
+      wx.reLaunch({
         url: route,
         fail: (err) => {
           console.error('导航失败:', route, err);
@@ -43,7 +43,7 @@ Component({
     },
 
     onUserTap() {
-      wx.navigateTo({
+      wx.reLaunch({
         url: '/pages/me/index',
         fail: (err) => {
           console.error('导航失败:', '/pages/me/index', err);
