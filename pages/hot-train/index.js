@@ -1,5 +1,6 @@
 // pages/hot-train/index.js
 const { detectPad } = require('../../utils/device.js')
+const { generateShenLunPrompt } = require('../../utils/ai-prompt.js')
 
 Page({
   data: {
@@ -8,47 +9,79 @@ Page({
     userAvatar: 'https://mgx-backend-cdn.metadl.com/generate/images/869485/2025-12-27/97908f92-7bdb-4515-8666-8093dcb25b5b.png',
 
     // 训练状态
-    statusTitle: '激发数字经济新动能',
-    topicTitle: '数字化赋能乡村治理',
+    statusTitle: '正在加载...',
+    topicTitle: '',
+    hotspotTitle: '',      // 新增：接收列表页title
+    question: '正在生成题目...', // 新增：AI生成的题目
+    material: '',          // 新增：AI生成的100字材料
     goalText: '写出 2-3 个分论点段落，字数 80-200 字。',
-    materialSnippet: '数字化赋能乡村治理，是实现乡村振兴的关键一环。通过引入大数据、物联网等技术，可以实现对乡村资源的精准管理和高效配置...',
-    materialFull: '数字化赋能乡村治理，是实现乡村振兴的关键一环。通过引入大数据、物联网等技术，可以实现对乡村资源的精准管理和高效配置。例如，在环境监测方面，通过传感器实时监控水质和空气质量；在政务服务方面，通过“一网通办”让村民足不出户就能办理各项业务。这不仅提高了治理效率，也增强了村民的获得感和幸福感。',
     showFullMaterial: false,
     
     // 推荐素材
-    recommendedMaterials: [
-      { type: '金句', icon: '⭐', content: '“数字经济是转型升级的‘新引擎’，更是民生保障的‘压舱石’。”' },
-      { type: '对策案例', icon: '✅', content: '浙江某地推广“一码办事”，将政务服务触角延伸至田间地头。' },
-      { type: '金句', icon: '⭐', content: '“以数字化转型驱动生产方式、生活方式和治理方式变革。”' },
-      { type: '对策案例', icon: '✅', content: '某市通过“城市大脑”实现交通拥堵指数下降15%。' },
-      { type: '政策', icon: '📜', content: '《关于加快推进数字乡村建设的指导意见》明确了阶段性目标。' },
-      { type: '金句', icon: '⭐', content: '“让数字红利惠及每一个偏远山村，不让一个人在数字时代掉队。”' },
-      { type: '对策案例', icon: '✅', content: '电商进农村工程带动农产品上行金额突破万亿元。' },
-      { type: '金句', icon: '⭐', content: '“数字技术与实体经济深度融合，是高质量发展的必由之路。”' },
-      { type: '对策案例', icon: '✅', content: '工业互联网平台连接设备数超过8000万台。' },
-      { type: '金句', icon: '⭐', content: '“数据要素的流动，正在重塑社会治理的每一个神经末梢。”' }
-    ],
+    recommendedMaterials: [],
 
     // 写作数据
     activeTabIndex: 0,
     tabs: ['分论点 1', '分论点 2', '分论点 3'],
-    paragraphs: [
-      '数字化赋能，要以‘精细化’提升公共服务触达率。',
-      '',
-      ''
-    ],
-    currentParagraph: '数字化赋能，要以‘精细化’提升公共服务触达率。',
-    wordCount: 23,
+    paragraphs: ['', '', ''],
+    currentParagraph: '',
+    wordCount: 0,
 
     // 评分结果
     showScore: false,
     scoreData: null,
     showMaterialModal: false,
-    selectedMaterial: null
+    selectedMaterial: null,
+    
+    // AI 评分标准与参考
+    scoringCriteria: null,
+    referenceAnswer: ''
   },
 
   onLoad(options) {
     this.detectDeviceType()
+    if (options.title) {
+      const title = decodeURIComponent(options.title);
+      this.setData({ 
+        hotspotTitle: title,
+        statusTitle: title,
+        topicTitle: title
+      });
+      this.generateAIMaterial(title);
+    }
+  },
+
+  async generateAIMaterial(title) {
+    wx.showLoading({ title: 'AI 出题中...' });
+    
+    // 模拟 AI 接口调用
+    setTimeout(() => {
+      const mockData = {
+        "question": `以'${title}'为题，写分论点。（30分）`,
+        "material": `${title}是当前社会关注的焦点。2025年相关领域规模持续扩大，占GDP比重稳步提升。但在发展过程中，仍面临基础设施薄弱、人才短缺、机制不活等挑战。需进一步夯实基础、培育动能、深化改革，推动高质量发展行稳致远。`,
+        "scoring_criteria": {
+          "结构": "总分总结构、逻辑清晰、层次分明",
+          "论点": "紧扣热点、站位准确、有深度", 
+          "论据": "数据支撑有力、案例典型、人民日报风格",
+          "语言": "精炼准确、文采斐然、无错别字"
+        },
+        "reference_answer": `${title}是新时代工作的重中之重。一是夯实基础，加快建设；二是培育产业，推动安全；三是深化改革，激发活力。只有这样，才能推动高质量发展。`,
+        "recommended_materials": [
+          { type: '数据', icon: '📊', content: "2025年该领域核心产业增加值占GDP比重达10%" },
+          { type: '案例', icon: '✅', content: "相关区域增速15.2%，高于全国平均水平" },
+          { type: '金句', icon: '⭐', content: "基础设施建设突破关键节点，位居全球前列" }
+        ]
+      };
+
+      this.setData({
+        question: mockData.question,
+        material: mockData.material,
+        scoringCriteria: mockData.scoring_criteria,
+        referenceAnswer: mockData.reference_answer,
+        recommendedMaterials: mockData.recommended_materials
+      });
+      wx.hideLoading();
+    }, 1500);
   },
 
   detectDeviceType() {

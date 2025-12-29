@@ -21,110 +21,40 @@
       </view>
 
       <view class="topic-list">
-        <view 
-          wx:for="{{hotTopics}}" 
-          wx:key="id"
-          class="topic-card"
-        >
-          <view class="card-content">
-            <view class="topic-info" bindtap="showFullTopic" data-index="{{index}}">
-              <view class="topic-title">{{item.title}}</view>
-              <view class="topic-summary">{{item.summary}}</view>
-              <view class="topic-footer">
-                <view class="topic-tags">
-                  <text wx:for="{{item.tags}}" wx:for-item="tag" wx:key="*this" class="tag">#{{tag}}</text>
-                </view>
-                <text class="topic-date">{{item.date}}</text>
-              </view>
-            </view>
-          </view>
-        </view>
-      </view>
-    </view>
-  </view>
-
-  <!-- 热点全文弹窗 -->
-  <view class="modal-overlay" wx:if="{{showTopicModal}}" bindtap="closeTopicModal">
-    <view class="modal-content" catchtap="true">
-      <view class="modal-header">
-        <text class="modal-title">热点详情</text>
-        <view class="close-btn" bindtap="closeTopicModal">×</view>
-      </view>
-      <scroll-view scroll-y class="modal-body">
-        <view class="full-topic-title">{{selectedTopic.title}}</view>
-        <view class="full-topic-date">{{selectedTopic.date}}</view>
-        <view class="full-topic-tags">
-          <text wx:for="{{selectedTopic.tags}}" wx:key="*this" class="tag">#{{item}}</text>
-        </view>
-        <view class="full-topic-content">
-          <text>{{selectedTopic.summary}}</text>
-          <!-- 这里可以放更详细的内容，目前先用summary代替 -->
-          <view style="margin-top: 20px; color: #6B7280; font-size: 14px; line-height: 1.8;">
-            这里是该热点的深度解读内容。通过对该政策/事件的结构化拆解，我们可以看到其背后的核心逻辑在于：
-            1. 坚持以人民为中心的发展思想，确保改革成果惠及全体人民。
-            2. 强化科技创新引领作用，为高质量发展注入新动能。
-            3. 完善基层治理体系，提升社会治理效能。
-          </view>
+        <!-- 加载状态 -->
+        <view class="loading-box" wx:if="{{loading}}">
+          <view class="loading-spinner"></view>
+          <text>正在同步最新热点...</text>
         </view>
 
-        <!-- AI 生成素材展示区 (已移至弹窗内) -->
-        <view class="ai-materials-area-modal" wx:if="{{selectedTopic.materials && selectedTopic.materials.length > 0}}">
-          <view class="ai-materials-header">
-            <view class="header-left">
-              <text class="ai-spark">✨</text>
-              <text>AI 生成素材 ({{selectedTopic.materials.length}})</text>
-            </view>
-          </view>
-          
-          <scroll-view scroll-x class="materials-scroll-modal">
-            <view class="materials-row-modal">
-              <view 
-                class="material-mini-card" 
-                wx:for="{{selectedTopic.materials}}" 
-                wx:for-item="material" 
-                wx:for-index="mIdx" 
-                wx:key="id"
-                bindtap="goToMaterialDetail"
-                data-topicid="{{selectedTopic.id}}"
-                data-materialindex="{{mIdx}}"
-              >
-                <view class="mini-card-top">
-                  <text class="mini-tag">{{material.category}}</text>
-                  <text class="mini-type badge-type-{{material.type === '金句' ? 'jinju' : (material.type === '案例' ? 'anli' : (material.type === '政策' ? 'zhengce' : (material.type === '对策' ? 'duice' : 'pianduan')))}}">{{material.type}}</text>
+        <!-- 列表内容 -->
+        <block wx:if="{{!loading}}">
+          <view 
+            wx:for="{{hotTopics}}" 
+            wx:key="id"
+            class="topic-card"
+          >
+            <view class="card-content">
+              <view class="topic-info">
+                <view class="topic-title-row">
+                  <text class="topic-title">{{item.title}}</text>
+                  <text class="source-tag {{item.source === '人民日报' ? 'source-rss' : 'source-local'}}">[{{item.source}}]</text>
                 </view>
-                <view class="mini-card-content">{{material.content}}</view>
-                <view class="mini-card-footer">
-                  <text class="mini-source">{{material.source}}</text>
-                  <view class="mini-actions">
-                    <view class="mini-prof">
-                      <view class="mini-prof-bar">
-                        <view class="mini-prof-fill" style="width: {{material.proficiency}}%"></view>
-                      </view>
-                    </view>
-                    <view class="btn-collect-mini" catchtap="addToLibraryFromModal" data-topicid="{{selectedTopic.id}}" data-materialindex="{{mIdx}}">
-                      <text>➕</text>
-                    </view>
+                <view class="topic-footer">
+                  <view class="topic-tags">
+                    <text wx:for="{{item.tags}}" wx:for-item="tag" wx:key="*this" class="tag">#{{tag}}</text>
                   </view>
+                  <text class="topic-date">{{item.date}}</text>
                 </view>
               </view>
+              <view class="card-right">
+                <button class="btn-train-direct" bindtap="goToTraining" data-title="{{item.title}}">
+                  开始训练 →
+                </button>
+              </view>
             </view>
-          </scroll-view>
-        </view>
-      </scroll-view>
-      <view class="modal-footer">
-        <button 
-          class="btn-generate-modal {{selectedTopic.isGenerating ? 'loading' : ''}}" 
-          bindtap="generateAICase" 
-          data-id="{{selectedTopic.id}}"
-          disabled="{{selectedTopic.isGenerating}}"
-        >
-          <text class="btn-icon">✨</text>
-          <text>生成素材</text>
-        </button>
-        <button class="btn-primary-full" bindtap="goToTrain" data-id="{{selectedTopic.id}}">
-          <text>去训练</text>
-          <text class="btn-arrow">✈️</text>
-        </button>
+          </view>
+        </block>
       </view>
     </view>
   </view>

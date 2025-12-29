@@ -22,7 +22,7 @@
 
   <view class="nav-bottom">
     <view class="user-avatar" bindtap="onUserTap">
-      <image src="{{userAvatar || '/assets/default-avatar.png'}}" mode="aspectFill"></image>
+      <image class="avatar-img" src="{{userAvatar || '/assets/default-avatar.png'}}" mode="aspectFill"></image>
     </view>
   </view>
 </view>

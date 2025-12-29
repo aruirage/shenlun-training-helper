@@ -53,13 +53,12 @@
             <view class="goal-text">目标：{{goalText}}</view>
           </view>
 
-          <!-- 材料摘要与全文 -->
+          <!-- 申论题目与 AI 材料 -->
           <view class="material-preview-section">
             <view class="material-preview">
-              <text class="material-title">材料摘要</text>
-              <text class="material-snippet">{{materialSnippet}}</text>
+              <text class="material-title">{{question}}</text>
               <button class="material-more" bindtap="toggleMaterialFull">
-                {{showFullMaterial ? '收起材料' : '展开查看全文'}}
+                {{showFullMaterial ? '收起材料' : '展开 AI 材料'}}
               </button>
             </view>
 
@@ -68,7 +67,10 @@
               scroll-y="true"
               class="material-full"
             >
-              <text class="material-full-text">{{materialFull}}</text>
+              <view class="ai-material-header">
+                <text class="ai-material-title">📄 AI 编写材料</text>
+              </view>
+              <text class="full-material-text">{{material}}</text>
             </scroll-view>
           </view>
 

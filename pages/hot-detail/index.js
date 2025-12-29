@@ -63,18 +63,24 @@ Page({
     wx.navigateBack();
   },
 
-  generateMaterials() {
-    wx.showLoading({ title: 'AI 生成中...' });
-    setTimeout(() => {
-      wx.hideLoading();
-      wx.showToast({ title: '已生成 10 条素材', icon: 'success' });
-      // 跳转到素材库或展示结果
-    }, 1500);
-  },
-
   goToTraining() {
     wx.navigateTo({
       url: `/pages/hot-train/index?id=${this.data.hotspot.id}`
+    });
+  },
+
+  // 复制热点摘要
+  copyContent(e) {
+    const field = e.currentTarget.dataset.field;
+    const content = this.data.hotspot[field];
+    
+    if (!content) return;
+    
+    wx.setClipboardData({
+      data: content,
+      success: () => {
+        wx.showToast({ title: '已复制', icon: 'success' });
+      }
     });
   }
 })

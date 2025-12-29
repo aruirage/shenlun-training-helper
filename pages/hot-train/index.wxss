@@ -234,34 +234,26 @@ page {
 .material-preview {
   display: flex;
   flex-direction: column;
-  gap: 8px;
+  gap: 12px;
 }
 
 .material-title {
-  font-size: 14px;
-  font-weight: 600;
-  color: #1D2129;
-}
-
-.material-snippet {
-  font-size: 13px;
-  color: #4E5969;
-  line-height: 1.6;
-  display: -webkit-box;
-  -webkit-box-orient: vertical;
-  -webkit-line-clamp: 2;
-  overflow: hidden;
+  font-size: 16px;
+  font-weight: 700;
+  color: #1E293B;
+  line-height: 1.5;
 }
 
 .material-more {
   margin: 0;
   padding: 0;
   background: none;
-  font-size: 12px;
-  color: #3478F6;
+  font-size: 13px;
+  color: #7C3AED;
   text-align: left;
   width: fit-content;
   line-height: 1.5;
+  font-weight: 600;
 }
 
 .material-more::after {
@@ -269,15 +261,27 @@ page {
 }
 
 .material-full {
-  margin-top: 12px;
-  max-height: 200px;
-  padding-top: 12px;
-  border-top: 1px dashed #E5E6EB;
+  margin-top: 16px;
+  max-height: 300px;
+  padding: 16px;
+  background: #F9FAFB;
+  border-radius: 12px;
+  border: 1px solid #F1F5F9;
 }
 
-.material-full-text {
+.ai-material-header {
+  margin-bottom: 12px;
+}
+
+.ai-material-title {
+  font-size: 14px;
+  font-weight: 600;
+  color: #7C3AED;
+}
+
+.full-material-text {
   font-size: 13px;
-  color: #4E5969;
+  color: #1E2937;
   line-height: 1.8;
   white-space: pre-wrap;
 }

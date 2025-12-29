@@ -83,10 +83,6 @@
 
         <!-- 底部操作栏 -->
         <view class="bottom-actions">
-          <button class="btn-generate" bindtap="generateMaterials">
-            <text class="btn-icon">✨</text>
-            <text>生成 10 条素材</text>
-          </button>
           <button class="btn-train" bindtap="goToTraining">
             <text class="btn-icon">🚀</text>
             <text>开始训练</text>

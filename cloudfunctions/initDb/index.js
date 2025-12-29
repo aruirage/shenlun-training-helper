@@ -146,6 +146,33 @@ const collections = [
       generatedText: '这是生成的示例文本内容',
       createdAt: Date.now()
     }
+  },
+  {
+    name: 'hotspots',
+    description: '每日热点集合',
+    indexes: [
+      { keys: { date: -1 }, name: 'date_desc_index' },
+      { keys: { tags: 1 }, name: 'tags_index' }
+    ],
+    sampleData: [
+      {
+        title: '激发数字经济新动能，绘就民生福祉新画卷',
+        summary: '今年以来，我国数字经济规模持续扩大，数字化转型在乡村治理、公共服务领域成效显著。',
+        date: '2025-12-27',
+        tags: ['数字经济', '乡村振兴'],
+        timeline: [
+          '2023年10月：政策初步调研',
+          '2023年12月：试点城市启动',
+          '2024年3月：全国范围推广'
+        ],
+        keyPoints: [
+          '「数字经济是转型升级的‘新引擎’，更是民生保障的‘压舱石’。」',
+          '「以数字化转型驱动生产方式、生活方式和治理方式变革。」'
+        ],
+        examValue: '考察重点：数字政府建设与基层减负的结合点。',
+        createdAt: Date.now()
+      }
+    ]
   }
 ]
 
