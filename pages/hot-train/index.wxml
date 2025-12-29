@@ -104,17 +104,89 @@
                       <text class="icon-save">💾</text>
                       <text>暂存</text>
                     </view>
-                    <view class="btn-primary-sm" bindtap="generateAIComment">
+                    <view class="btn-primary-sm" bindtap="submitScore">
                       <text class="icon-sparkles">✨</text>
-                      <text>生成 AI 点评</text>
+                      <text>提交评分</text>
                     </view>
                   </view>
                 </view>
               </view>
             </view>
+
+            <!-- 评分展开区域 -->
+            <view class="score-section {{showScore ? 'expanded' : ''}}" wx:if="{{showScore}}">
+              <view class="score-header">
+                <view class="total-score-box">
+                  <text class="score-num">{{scoreData.total}}</text>
+                  <text class="score-label">总分</text>
+                </view>
+                <view class="radar-placeholder">
+                  <!-- 这里可以用简单的进度条模拟雷达图的5个维度 -->
+                  <view class="dimension-item" wx:for="{{scoreData.details}}" wx:key="name">
+                    <text class="dim-name">{{item.name}}</text>
+                    <view class="dim-bar-bg">
+                      <view class="dim-bar-fill" style="width: {{(item.score/item.max)*100}}%"></view>
+                    </view>
+                    <text class="dim-score">{{item.score}}/{{item.max}}</text>
+                  </view>
+                </view>
+              </view>
+
+              <view class="comparison-section">
+                <view class="compare-card user-card">
+                  <view class="card-title">你的表达</view>
+                  <view class="card-text">{{currentParagraph}}</view>
+                </view>
+                <view class="compare-card ai-card">
+                  <view class="card-title">AI 优化版 <text class="boost-tag">{{scoreData.rewrite.scoreBoost}}</text></view>
+                  <view class="card-text">{{scoreData.rewrite.rewritten}}</view>
+                </view>
+              </view>
+
+              <view class="recommended-materials-section">
+                <view class="section-title">推荐素材</view>
+                <view class="material-tags">
+                  <view 
+                    class="material-tag" 
+                    wx:for="{{scoreData.materials}}" 
+                    wx:key="id"
+                    bindtap="onMaterialClick"
+                    data-item="{{item}}"
+                  >
+                    <text class="tag-type">[{{item.type}}]</text>
+                    <text class="tag-content">{{item.content}}</text>
+                  </view>
+                </view>
+              </view>
+
+              <view class="collapse-btn" bindtap="collapseReview">
+                <text>收起点评</text>
+                <text class="icon-up">↑</text>
+              </view>
+            </view>
           </view>
         </view>
       </main>
+    </view>
+  </view>
+
+  <!-- 素材详情弹窗 -->
+  <view class="modal-mask" wx:if="{{showMaterialModal}}" bindtap="closeMaterialModal">
+    <view class="material-modal" catchtap="true">
+      <view class="modal-header">
+        <text class="modal-title">{{selectedMaterial.type}}详情</text>
+        <view class="close-icon" bindtap="closeMaterialModal">×</view>
+      </view>
+      <view class="modal-body">
+        <view class="material-main-content">{{selectedMaterial.content}}</view>
+        <view class="material-detail-text" wx:if="{{selectedMaterial.detail}}">
+          <text class="detail-label">解析：</text>
+          <text>{{selectedMaterial.detail}}</text>
+        </view>
+      </view>
+      <view class="modal-footer">
+        <button class="btn-copy" bindtap="copyMaterial">复制素材</button>
+      </view>
     </view>
   </view>
 </view>

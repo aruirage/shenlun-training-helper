@@ -99,6 +99,16 @@ page {
 }
 
 /* ========== 右侧主内容区 ========== */
+.hotspot-item {
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  transform: translateY(0);
+}
+
+.hotspot-item.hover {
+  transform: translateY(-8rpx) scale(1.02);
+  box-shadow: 0 32rpx 64rpx rgba(124, 58, 237, 0.2);
+}
+
 .home-main {
   flex: 1;
   margin-left: 80px;

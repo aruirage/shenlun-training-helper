@@ -91,7 +91,7 @@
               <view class="link-left">
                 <view class="link-icon-box bg-emerald">📈</view>
                 <view class="link-text">
-                  <text class="link-title">模考记录</text>
+                  <text class="link-title">训练/点评历史</text>
                   <text class="link-subtitle">查看历史评分趋势</text>
                 </view>
               </view>
